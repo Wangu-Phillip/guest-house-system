@@ -24,6 +24,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <a class="nav-link <?= ($current_page == 'rooms.php') ? 'active' : '' ?>" href="rooms.php">Rooms</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link <?= ($current_page == 'calendar.php') ? 'active' : '' ?>" href="calendar.php">Calendar</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link <?= ($current_page == 'reports.php') ? 'active' : '' ?>" href="reports.php">Reports</a>
                 </li>
                 <li class="nav-item">
