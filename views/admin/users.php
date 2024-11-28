@@ -7,7 +7,7 @@ include '../../components/navbar.php';
     <div class="row d-flex justify-content-end align-items-center mb-3">
         <div class="col-md-4">
             <input id="search" class="form-control me-2 me-auto" type="search" placeholder="Search by name" aria-label="Search">
-        </div>    
+        </div>
     </div>
 
     <table class="table table-hover table-striped">
@@ -37,22 +37,22 @@ include '../../components/navbar.php';
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const searchInput = document.getElementById("search");
-    const userTable = document.getElementById("userTable");
-    const userCount = document.getElementById("userCount");
+    document.addEventListener("DOMContentLoaded", function() {
+        const searchInput = document.getElementById("search");
+        const userTable = document.getElementById("userTable");
+        const userCount = document.getElementById("userCount");
 
-    // Fetch and display users dynamically
-    function fetchUsers(query = "") {
-        fetch(`../../backend/search_users.php?query=${query}`)
-            .then(response => response.json())
-            .then(data => {
-                userTable.innerHTML = "";
-                userCount.textContent = `Users: ${data.count}`;
-                
-                if (data.users.length > 0) {
-                    data.users.forEach((user, index) => {
-                        const row = `<tr>
+        // Fetch and display users dynamically
+        function fetchUsers(query = "") {
+            fetch(`../../backend/search_users.php?query=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    userTable.innerHTML = "";
+                    userCount.textContent = `Users: ${data.count}`;
+
+                    if (data.users.length > 0) {
+                        data.users.forEach((user, index) => {
+                            const row = `<tr>
                             <td>${index + 1}</td>
                             <td>${user.employee_name}</td>
                             <td>${user.email}</td>
@@ -62,29 +62,71 @@ document.addEventListener("DOMContentLoaded", function () {
                             <td>${user.salary}</td>
                             <td>
                                 <a href="#" class="text-success"><i class="bi bi-pencil-square"></i></a>
-                                <a href="#" class="text-danger ms-2"><i class="bi bi-trash"></i></a>
+                                <a href="#" class="text-danger ms-2 delete-user" data-id="${user.user_id}">
+                                    <i class="bi bi-trash"></i>
+                                </a>
                             </td>
                         </tr>`;
-                        userTable.insertAdjacentHTML("beforeend", row);
-                    });
-                } else {
-                    userTable.innerHTML = `<tr>
+                            userTable.insertAdjacentHTML("beforeend", row);
+                        });
+
+                        // Attach delete functionality
+                        attachDeleteHandlers();
+                    } else {
+                        userTable.innerHTML = `<tr>
                         <td colspan="8" class="text-center text-muted">No users found</td>
                     </tr>`;
-                }
-            })
-            .catch(error => console.error("Error fetching users:", error));
-    }
+                    }
+                })
+                .catch(error => console.error("Error fetching users:", error));
+        }
 
-    // Initial load
-    fetchUsers();
+        // Attach delete handlers to delete buttons
+        function attachDeleteHandlers() {
+            const deleteButtons = document.querySelectorAll(".delete-user");
+            deleteButtons.forEach(button => {
+                button.addEventListener("click", function(event) {
+                    event.preventDefault();
+                    const userId = this.getAttribute("data-id");
+                    if (confirm("Are you sure you want to delete this user?")) {
+                        deleteUser(userId);
+                    }
+                });
+            });
+        }
 
-    // Listen for input changes and perform live search
-    searchInput.addEventListener("input", () => {
-        const query = searchInput.value.trim();
-        fetchUsers(query);
+        // Delete user
+        function deleteUser(userId) {
+            fetch(`../../backend/delete_user.php`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        user_id: userId
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("User deleted successfully.");
+                        fetchUsers(); // Refresh the table
+                    } else {
+                        alert("Error deleting user: " + data.message);
+                    }
+                })
+                .catch(error => console.error("Error deleting user:", error));
+        }
+
+        // Initial load
+        fetchUsers();
+
+        // Live search
+        searchInput.addEventListener("input", () => {
+            const query = searchInput.value.trim();
+            fetchUsers(query);
+        });
     });
-});
 </script>
 
 <?php include '../../components/footer.php'; ?>
