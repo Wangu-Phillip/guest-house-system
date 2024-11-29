@@ -3,23 +3,6 @@ include '../../components/header.php';
 include '../../components/navbar.php';
 ?>
 
-<!-- SUCCESS/ERROR TOAST -->
-<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1050;">
-    <div id="toastNotification" class="toast align-items-center" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header bg-light">
-            <span id="toastIcon" class="me-2"></span>
-            <strong id="toastHeading" class="me-auto">Message</strong>
-            <small id="toastTime">Just now</small>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body" id="toastMessage">
-            <!-- Toast Message -->
-        </div>
-        <div id="toastProgress" class="progress position-relative bottom-0 start-2 w-100" style="height: 3px;">
-            <div class="progress-bar bg-success" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-        </div>
-    </div>
-</div>
 
 <br><br>
 
@@ -130,7 +113,7 @@ include '../../components/navbar.php';
                     <input type="hidden" id="addUserId" name="user_id">
                     <div class="mb-3">
                         <label for="addFirstname" class="form-label">First Name</label>
-                        <input type="text" class="form-control" id="editFirstname" name="firstname" required>
+                        <input type="text" class="form-control" id="addFirstname" name="firstname" required>
                     </div>
                     <div class="mb-3">
                         <label for="addLastname" class="form-label">Last Name</label>
@@ -268,65 +251,7 @@ include '../../components/navbar.php';
         editModal.show();
     }
 
-    // FUNCTION TO DISPLAY THE TOAST MESSAGE
-    function showToast(isSuccess, message, duration = 5000) {
-        const toastElement = document.getElementById("toastNotification");
-        const toastHeading = document.getElementById("toastHeading");
-        const toastMessage = document.getElementById("toastMessage");
-        const toastTime = document.getElementById("toastTime");
-        const toastIcon = document.getElementById("toastIcon");
-        const progressBar = document.querySelector("#toastProgress .progress-bar");
-
-        // Get current time
-        const now = new Date();
-        const formattedTime = now.toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-        });
-        toastTime.textContent = formattedTime;
-
-        // Set Toast content and icon
-        if (isSuccess) {
-            toastHeading.textContent = "Success";
-            toastHeading.classList.remove("text-danger");
-            toastHeading.classList.add("text-success");
-            toastMessage.textContent = message;
-
-            // Green tick icon for success
-            toastIcon.innerHTML = `<i class="bi bi-check-circle-fill text-success" style="font-size: 1.2rem;"></i>`;
-            progressBar.classList.replace("bg-danger", "bg-success");
-        } else {
-            toastHeading.textContent = "Error";
-            toastHeading.classList.remove("text-success");
-            toastHeading.classList.add("text-danger");
-            toastMessage.textContent = message;
-
-            // Red X icon for error
-            toastIcon.innerHTML = `<i class="bi bi-x-circle-fill text-danger" style="font-size: 1.2rem;"></i>`;
-            progressBar.classList.replace("bg-success", "bg-danger");
-        }
-
-        // Reset and animate progress bar
-        progressBar.style.width = "100%";
-        progressBar.style.transition = `width ${duration}ms linear`;
-        setTimeout(() => {
-            progressBar.style.width = "0%";
-        }, 0);
-
-        // Show the Toast
-        const toast = new bootstrap.Toast(toastElement, {
-            delay: duration,
-        });
-        toast.show();
-    }
-
-    // Trigger Toast if URL contains success or error messages
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has("success")) {
-        showToast(true, urlParams.get("success"), 5000);
-    } else if (urlParams.has("error")) {
-        showToast(false, urlParams.get("error"), 5000);
-    }
+    
 </script>
 
 
