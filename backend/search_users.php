@@ -1,35 +1,36 @@
+
 <?php
-include './db_connection.php';
+@include "./db_connection.php";
 
-$query = isset($_GET['query']) ? trim($_GET['query']) : "";
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["search"])) {
+    $search = mysqli_real_escape_string($conn, $_POST["search"]);
 
-$sql = "SELECT user_id, CONCAT(firstname, ' ', lastname) AS employee_name, email, phone, role, status, salary 
-        FROM users";
+    $sql = "SELECT * FROM users WHERE email LIKE '%$search%'";
+    $result = mysqli_query($conn, $sql);
 
-if (!empty($query)) {
-    $sql .= " WHERE firstname LIKE ? OR lastname LIKE ? OR CONCAT(firstname, ' ', lastname) LIKE ?";
+    if ($result && mysqli_num_rows($result) > 0) {
+        $count = 1;
+        while ($row = mysqli_fetch_assoc($result)) {
+            echo "<tr>";
+            echo "<td>" . $count++ . "</td>";
+            echo "<td>" . $row["firstname"] . $row["lastname"] . "</td>";
+            echo "<td>" . $row["email"] . "</td>";
+            echo "<td>" . $row["phone"] . "</td>";
+            echo "<td>" . $row["role"] . "</td>";
+            echo "<td>" . $row["status"] . "</td>";
+            echo "<td>" . $row["salary"] . "</td>";
+            echo "<td>";
+            echo "<form method='post' action='../../backend/delete_user.php'>";
+            echo "<input type='hidden' name='delete' value='" . $row["email"] . "'>";
+            echo "<input class='btn btn-danger' type='submit' value='Delete'>";
+            echo "</form>";
+            echo "</td>";
+            echo "</tr>";
+        }
+    } else {
+        echo "<tr><td colspan='6'>No results found</td></tr>";
+    }
+
+    mysqli_close($conn);
 }
-
-$stmt = $conn->prepare($sql);
-
-if (!empty($query)) {
-    $search = "%" . $query . "%";
-    $stmt->bind_param("sss", $search, $search, $search);
-}
-
-$stmt->execute();
-$result = $stmt->get_result();
-
-$users = [];
-while ($row = $result->fetch_assoc()) {
-    $users[] = $row;
-}
-
-$response = [
-    "count" => count($users),
-    "users" => $users,
-];
-
-header("Content-Type: application/json");
-echo json_encode($response);
 ?>
