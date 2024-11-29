@@ -20,13 +20,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Verify the password
             if (password_verify($password, $user['password'])) {
                 // Set session variables
-                $_SESSION['user_id'] = $user['user_id'];
-                $_SESSION['firstname'] = $user['firstname'];
                 $_SESSION['role'] = $user['role'];
 
-                // Redirect to dashboard with success message
-                header("Location: ../views/admin/dashboard.php?success=Welcome back, {$user['firstname']}!");
-                exit();
+                if ($_SESSION["role"] == "admin") {
+
+                    $_SESSION['firstname'] = $user['firstname'];
+                    $_SESSION['lastname'] = $user['lastname'];
+                    $_SESSION["admin_email"] = $row["email"];
+                    $_SESSION["admin_id"] = $user["user_id"];
+        
+                    header("Location: ../views/admin/dashboard.php?success=Welcome back, {$user['firstname']}!");
+                    exit();
+                } elseif ($row["role"] == "employee") {
+        
+                    $_SESSION['employeeFname'] = $user['firstname'];
+                    $_SESSION['employeeLname'] = $user['lastname'];
+                    $_SESSION["employee_email"] = $row["email"];
+                    $_SESSION["employee_id"] = $user["user_id"];
+        
+                    header("Location: ../views/admin/dashboard.php?success=Welcome back, {$user['firstname']}!");
+                    exit();
+                }
+
             } else {
                 // Incorrect password
                 header("Location: ../index.php?error=Invalid password.");
