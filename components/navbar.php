@@ -30,7 +30,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <a class="nav-link <?= ($current_page == 'reports.php') ? 'active' : '' ?>" href="reports.php">Reports</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="../../index.php">Logout</a>
+                    <a class="nav-link" href="../../views/logout.php">Logout</a>
                 </li>
             </ul>
         </div>
