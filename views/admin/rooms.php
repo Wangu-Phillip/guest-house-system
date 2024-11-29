@@ -42,7 +42,7 @@ include '../../backend/db_connection.php';
     <section class="container">
         <!-- Button trigger modal -->
         <a href="#" data-bs-toggle="modal" data-bs-target="#addProductModal">
-            <button type="button" class="btn btn-primary text-end">Add products</button>
+            <button type="button" class="btn btn-primary text-end">Add a room</button>
         </a>
         <br><br>
 
@@ -110,7 +110,7 @@ include '../../backend/db_connection.php';
         <div class="modal-dialog modal-md"> <!-- Makes the modal wider -->
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addProductModalLabel">Add Product</h5>
+                    <h5 class="modal-title" id="addProductModalLabel">Add a room</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
@@ -149,7 +149,7 @@ include '../../backend/db_connection.php';
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editProductModalLabel">Edit Product</h5>
+                    <h5 class="modal-title" id="editProductModalLabel">Edit Room Details</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
