@@ -57,14 +57,14 @@ $result = $conn->query($sql);
                 class="form-control"
                 id="searchInput"
                 placeholder="Search booking by guest name..."
-                onkeyup="searchProduct()" />
+                onkeyup="searchBooking()" />
         </div>
     </div>
 </div>
 
 <!-- BOOKINGS SECTION START -->
 <div class="container mt-2">
-    <table class="table table-hover table-striped">
+    <table class="table table-hover table-striped" id="bookingsTable">
         <thead class="table-success">
             <tr>
                 <th>Date</th>
@@ -311,6 +311,22 @@ $result = $conn->query($sql);
     });
 
     // FUNCTION TO SEARCH BOOKING BY GUEST NAME
+    // Function to search booking by guest name
+    function searchBooking() {
+        const query = document.getElementById("searchInput").value.trim();
+        const xhr = new XMLHttpRequest();
+
+        xhr.open("POST", "../../backend/search_booking.php", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        xhr.onreadystatechange = function() {
+            if (this.readyState === 4 && this.status === 200) {
+                document.querySelector("#bookingsTable tbody").innerHTML = this.responseText;
+            }
+        };
+
+        xhr.send("search=" + encodeURIComponent(query));
+    }
 
 
     // FUNCTION TO CREATE BOOKING
