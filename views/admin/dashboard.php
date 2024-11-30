@@ -8,14 +8,15 @@ include '../../backend/db_connection.php';
 
 // Sample queries for data display
 $totalGuests = $conn->query("SELECT COUNT(*) AS count FROM guests")->fetch_assoc()['count'];
-$totalRooms = $conn->query("SELECT COUNT(*) AS count FROM rooms")->fetch_assoc()['count'];
+$totalAmount = $conn->query("SELECT COUNT(*) AS count FROM bookings")->fetch_assoc()['count'];
 $totalBookings = $conn->query("SELECT COUNT(*) AS count FROM bookings")->fetch_assoc()['count'];
 ?>
 <div class="container mt-5">
     <div class="row">
+        <h3>Monthly Statistics</h3>
         <!-- Dashboard Overview Cards -->
         <div class="col-md-4">
-            <div class="card text-center">
+            <div class="card text-center shadow">
                 <div class="card-body">
                     <h5 class="card-title">Total Guests</h5>
                     <p class="card-text"><?= $totalGuests ?></p>
@@ -24,14 +25,14 @@ $totalBookings = $conn->query("SELECT COUNT(*) AS count FROM bookings")->fetch_a
         </div>
         <div class="col-md-4">
             <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">Total Rooms</h5>
-                    <p class="card-text"><?= $totalRooms ?></p>
+                <div class="card-body shadow">
+                    <h5 class="card-title">Total Earnings</h5>
+                    <p class="card-text"><?= $totalAmount ?></p>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card text-center">
+            <div class="card text-center shadow">
                 <div class="card-body">
                     <h5 class="card-title">Total Bookings</h5>
                     <p class="card-text"><?= $totalBookings ?></p>

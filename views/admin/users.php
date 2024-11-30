@@ -128,7 +128,7 @@ include '../../components/navbar.php';
                         <input type="text" class="form-control" id="addPhone" name="phone" required>
                     </div>
                     <div class="mb-3">
-                        <label for="addRole" class="form-label">Role</label>
+                        <label for="addRole2" class="form-label">Role</label>
                         <select class="form-select" id="addRole" name="role" required>
                             <option value="admin">Admin</option>
                             <option value="employee">Employee</option>
