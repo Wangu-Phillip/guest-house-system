@@ -5,15 +5,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $conn->begin_transaction();
 
     try {
-        $created_at = date('Y-m-d H:i:s');
-
         // Save Guest Details
         $stmt = $conn->prepare("
-            INSERT INTO guests (firstname, lastname, omang_id, phone, address, company, email, citizenship, country, car_registration_no, created_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO guests (firstname, lastname, omang_id, phone, address, company, email, citizenship, country, car_registration_no) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->bind_param(
-            "sssssssssss",
+            "ssssssssss",
             $_POST['firstname'], 
             $_POST['lastname'], 
             $_POST['omang'], 
@@ -23,8 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['email'], 
             $_POST['citizenship'], 
             $_POST['country'], 
-            $_POST['car_registration_no'], 
-            $created_at
+            $_POST['car_registration_no']
         );
         $stmt->execute();
         $guest_id = $stmt->insert_id;
@@ -48,11 +45,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Save Booking Details
         $stmt = $conn->prepare("
-            INSERT INTO bookings (guest_id, room_id, price, date, status, payment_method, check_in, check_out, number_of_guests, number_of_nights, created_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO bookings (guest_id, room_id, price, date, status, payment_method, check_in, check_out, number_of_guests, number_of_nights) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->bind_param(
-            "iissssssiss",
+            "iissssssii",
             $guest_id, 
             $_POST['roomNo'], 
             $_POST['amount'], 
@@ -62,8 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['check_in'], 
             $_POST['check_out'], 
             $_POST['number_of_guests'], 
-            $_POST['number_of_nights'], 
-            $created_at
+            $_POST['number_of_nights']
         );
         $stmt->execute();
 
