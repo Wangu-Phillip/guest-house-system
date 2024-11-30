@@ -5,6 +5,7 @@ include '../../backend/db_connection.php';
 
 // Fetch bookings from the database
 $sql = "SELECT 
+            b.booking_id,
             b.date, 
             CONCAT(g.firstname, ' ', g.lastname) AS guest_name, 
             g.phone AS guest_number, 
@@ -92,9 +93,14 @@ $result = $conn->query($sql);
                         <td><?= htmlspecialchars($row['check_in']) ?: '-' ?></td>
                         <td><?= htmlspecialchars($row['check_out']) ?: '-' ?></td>
                         <td>
-                            <a href="#" class="text-success"><i class="bi bi-pencil-square"></i></a>
-                            <a href="#" class="text-danger ms-2"><i class="bi bi-trash"></i></a>
+                            <form action="../../backend/delete_booking.php" method="post" style="display: inline;">
+                                <input type="hidden" name="delete" value="<?= $row['booking_id'] ?>">
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
                         </td>
+
                     </tr>
                 <?php endwhile; ?>
             <?php else: ?>
@@ -267,11 +273,11 @@ $result = $conn->query($sql);
                         </div>
                         <div class="mb-3">
                             <label for="addCheckIn" class="form-label">Check-In</label>
-                            <input type="datetime-local" class="form-control" id="addCheckIn" name="check_in" >
+                            <input type="datetime-local" class="form-control" id="addCheckIn" name="check_in">
                         </div>
                         <div class="mb-3">
                             <label for="addCheckOut" class="form-label">Check-Out</label>
-                            <input type="datetime-local" class="form-control" id="addCheckOut" name="check_out" >
+                            <input type="datetime-local" class="form-control" id="addCheckOut" name="check_out">
                         </div>
                         <div class="d-flex justify-content-between">
                             <button type="button" class="btn btn-secondary" onclick="showSection(2)">Previous</button>
