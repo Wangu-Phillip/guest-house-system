@@ -211,6 +211,8 @@ if ($result && $result->num_rows > 0) {
         <h2 id="currentMonth"></h2>
         <button id="nextMonth" class="btn btn-dark">Next</button>
     </div>
+
+    <!-- CALENDAR -->
     <div id="calendar"></div>
 </div>
 <br><br>
@@ -220,11 +222,22 @@ if ($result && $result->num_rows > 0) {
     #calendar {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
+        /* 7 columns for each day of the week */
         grid-auto-rows: 100px;
         gap: 1px;
         background: #fff;
         border: #fff 5px solid;
         border-radius: 5px;
+    }
+
+    .day-header {
+        text-align: center;
+        padding: 10px 0;
+        background: #f1f1f1;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-weight: bold;
+        font-size: 16px;
     }
 
     .day {
@@ -261,108 +274,120 @@ if ($result && $result->num_rows > 0) {
 </style>
 
 <script>
-
     // CALENDAR BOOKING LISTENER
-    document.addEventListener("DOMContentLoaded", function () {
-    const bookings = <?= json_encode($bookings) ?>; // Booking data from PHP
-    const calendarEl = document.getElementById("calendar");
-    const currentMonthEl = document.getElementById("currentMonth");
-    const prevMonthBtn = document.getElementById("prevMonth");
-    const nextMonthBtn = document.getElementById("nextMonth");
-    const createBookingModal = new bootstrap.Modal(document.getElementById("createBookingModal"));
-    const addDateInput = document.getElementById("addDate"); // Date input in the modal
+    document.addEventListener("DOMContentLoaded", function() {
+        const bookings = <?= json_encode($bookings) ?>; // Booking data from PHP
+        const calendarEl = document.getElementById("calendar");
+        const currentMonthEl = document.getElementById("currentMonth");
+        const prevMonthBtn = document.getElementById("prevMonth");
+        const nextMonthBtn = document.getElementById("nextMonth");
+        const createBookingModal = new bootstrap.Modal(document.getElementById("createBookingModal"));
+        const addDateInput = document.getElementById("addDate"); // Date input in the modal
 
-    let currentDate = new Date(); // Initialize to today's date
+        let currentDate = new Date(); // Initialize to today's date
 
-    function renderCalendar(date) {
-        calendarEl.innerHTML = ""; // Clear the existing calendar
-        const year = date.getFullYear();
-        const month = date.getMonth(); // 0-indexed for JavaScript (0 = January)
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const firstDay = new Date(year, month, 1).getDay();
+        function renderCalendar(date) {
+            calendarEl.innerHTML = ""; // Clear the existing calendar
+            const year = date.getFullYear();
+            const month = date.getMonth(); // 0-indexed for JavaScript (0 = January)
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const firstDay = new Date(year, month, 1).getDay();
 
-        // Set the current month and year in the header
-        currentMonthEl.textContent = date.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-        });
-
-        // Render blank days for the previous month
-        for (let i = 0; i < firstDay; i++) {
-            const blankEl = document.createElement("div");
-            blankEl.classList.add("day");
-            blankEl.style.background = "#f9f9f9"; // Lighter background for blank days
-            calendarEl.appendChild(blankEl);
-        }
-
-        // Render calendar days
-        for (let i = 1; i <= daysInMonth; i++) {
-            const dayEl = document.createElement("div");
-            dayEl.classList.add("day");
-            dayEl.dataset.date = `${year}-${String(month + 1).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
-
-            // Highlight today's date
-            if (new Date().toDateString() === new Date(year, month, i).toDateString()) {
-                dayEl.style.background = "lightblue"; // Highlight the current day
-            }
-
-            // Add day number
-            const dateEl = document.createElement("div");
-            dateEl.classList.add("date");
-            dateEl.innerText = i;
-            dayEl.appendChild(dateEl);
-
-            // Add events if they exist
-            bookings.forEach((booking) => {
-                if (booking.date === dayEl.dataset.date) {
-                    const eventEl = document.createElement("div");
-                    eventEl.classList.add("event");
-                    eventEl.innerText = booking.title;
-                    dayEl.appendChild(eventEl);
-                }
+            // Set the current month and year in the header
+            currentMonthEl.textContent = date.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
             });
 
-            // Add click event to open the modal and set the date
-            dayEl.addEventListener("click", function () {
-                const selectedDate = dayEl.dataset.date; // Get the selected date
-                addDateInput.value = selectedDate; // Set the date in the modal's date input
-                createBookingModal.show(); // Show the modal
+            // Add the day headers
+            const dayHeaders = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            dayHeaders.forEach(day => {
+                const headerEl = document.createElement("div");
+                headerEl.classList.add("day-header");
+                headerEl.style.fontWeight = "bold";
+                headerEl.innerText = day;
+                calendarEl.appendChild(headerEl);
             });
 
-            calendarEl.appendChild(dayEl);
-        }
-
-        // Fill remaining days to complete the week (if needed)
-        const totalDays = firstDay + daysInMonth;
-        const remainingDays = 7 - (totalDays % 7);
-        if (remainingDays < 7) {
-            for (let i = 0; i < remainingDays; i++) {
+            // Render blank days for the days before the first day of the month
+            for (let i = 0; i < firstDay; i++) {
                 const blankEl = document.createElement("div");
                 blankEl.classList.add("day");
                 blankEl.style.background = "#f9f9f9"; // Lighter background for blank days
+                blankEl.style.border = "none"; // Optional: remove border for blank days
                 calendarEl.appendChild(blankEl);
             }
+
+            // Render calendar days
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayEl = document.createElement("div");
+                dayEl.classList.add("day");
+                dayEl.dataset.date = `${year}-${String(month + 1).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
+
+                // Highlight today's date
+                if (new Date().toDateString() === new Date(year, month, i).toDateString()) {
+                    dayEl.style.background = "lightblue"; // Highlight the current day
+                }
+
+                // Add day number
+                const dateEl = document.createElement("div");
+                dateEl.classList.add("date");
+                dateEl.innerText = i;
+                dayEl.appendChild(dateEl);
+
+                // Add events if they exist
+                bookings.forEach((booking) => {
+                    if (booking.date === dayEl.dataset.date) {
+                        const eventEl = document.createElement("div");
+                        eventEl.classList.add("event");
+                        eventEl.innerText = booking.title;
+                        dayEl.appendChild(eventEl);
+                    }
+                });
+
+                // Add click event to open the modal and set the date
+                dayEl.addEventListener("click", function() {
+                    const selectedDate = dayEl.dataset.date; // Get the selected date
+                    addDateInput.value = selectedDate; // Set the date in the modal's date input
+                    createBookingModal.show(); // Show the modal
+                });
+
+                calendarEl.appendChild(dayEl);
+            }
+
+            // Fill remaining days to complete the week (if needed)
+            const totalDays = firstDay + daysInMonth;
+            const remainingDays = 7 - (totalDays % 7);
+            if (remainingDays < 7) {
+                for (let i = 0; i < remainingDays; i++) {
+                    const blankEl = document.createElement("div");
+                    blankEl.classList.add("day");
+                    blankEl.style.background = "#f9f9f9"; // Lighter background for blank days
+                    blankEl.style.border = "none"; // Optional: remove border for blank days
+                    calendarEl.appendChild(blankEl);
+                }
+            }
         }
-    }
 
-    // Event listeners for navigation buttons
-    prevMonthBtn.addEventListener("click", function () {
-        currentDate.setMonth(currentDate.getMonth() - 1);
+
+        // Event listeners for navigation buttons
+        prevMonthBtn.addEventListener("click", function() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar(currentDate);
+        });
+
+        // VIEW PREVIOUS & NEXT MONTHS 
+        nextMonthBtn.addEventListener("click", function() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar(currentDate);
+        });
+
+        // Initial render
         renderCalendar(currentDate);
     });
 
-    // VIEW PREVIOUS & NEXT MONTHS 
-    nextMonthBtn.addEventListener("click", function () {
-        currentDate.setMonth(currentDate.getMonth() + 1);
-        renderCalendar(currentDate);
-    });
-
-    // Initial render
-    renderCalendar(currentDate);
-});
-
-// FUNCTION TO CREATE BOOKING
-function createBooking() {
+    // FUNCTION TO CREATE BOOKING
+    function createBooking() {
         // Show the modal
         var editModal = new bootstrap.Modal(document.getElementById('createBookingModal'));
         editModal.show();
