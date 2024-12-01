@@ -7,23 +7,46 @@ include '../../components/toast.php';
 include '../../backend/db_connection.php';
 
 // Queries for total statistics
-$totalGuests = $conn->query("SELECT COUNT(*) AS count FROM guests")->fetch_assoc()['count'];
-$totalBookings = $conn->query("SELECT COUNT(*) AS count FROM bookings WHERE check_out IS NOT NULL AND check_out != ''")->fetch_assoc()['count'];
-$totalAmount = $conn->query("
-    SELECT SUM(price) AS total 
+$currentMonth = date('m'); // Get current month as a two-digit number (e.g., 11 for November)
+$currentYear = date('Y'); // Get current year
+
+$totalGuests = $conn->query("
+    SELECT SUM(number_of_guests) AS count 
+    FROM bookings b, guests g
+    WHERE b.guest_id = g.guest_id
+    AND MONTH(b.check_out) = $currentMonth
+    AND YEAR(b.check_out) = $currentYear
+")->fetch_assoc()['count'];
+
+$totalBookings = $conn->query("
+    SELECT COUNT(*) AS count 
     FROM bookings 
-    WHERE check_out IS NOT NULL AND check_out != ''
+    WHERE check_out IS NOT NULL 
+    AND check_out != ''
+    AND MONTH(check_out) = $currentMonth
+    AND YEAR(check_out) = $currentYear
+")->fetch_assoc()['count'];
+
+$totalAmount = $conn->query("
+    SELECT SUM(r.price) AS total 
+    FROM bookings b, rooms r
+    WHERE b.check_out IS NOT NULL 
+    AND b.check_out != '' 
+    AND r.room_id = b.room_id
+    AND MONTH(b.check_out) = $currentMonth
+    AND YEAR(b.check_out) = $currentYear
 ")->fetch_assoc()['total'] ?? 0;
 
 // Query to get monthly statistics
 $monthlyStats = $conn->query("
     SELECT 
-        MONTHNAME(check_out) AS month_name, 
-        YEAR(check_out) AS year,
-        SUM(price) AS total_amount, 
+        MONTHNAME(b.check_out) AS month_name, 
+        YEAR(b.check_out) AS year,
+        SUM(r.price) AS total_amount, 
         COUNT(*) AS total_bookings 
-    FROM bookings 
+    FROM bookings b, rooms r
     WHERE check_out IS NOT NULL AND check_out != ''
+    AND r.room_id = b.room_id
     GROUP BY YEAR(check_out), MONTH(check_out)
     ORDER BY YEAR(check_out), MONTH(check_out)
 ");
@@ -38,7 +61,7 @@ while ($row = $monthlyStats->fetch_assoc()) {
     ];
 }
 
-// Recent bookings for display
+// RECENT BOOKINGS FOR DISPLAY
 $recentBookings = $conn->query("
     SELECT bookings.date, 
            CONCAT(guests.firstname, ' ', guests.lastname) AS guest_name, 
@@ -52,8 +75,10 @@ $recentBookings = $conn->query("
     LIMIT 5
 ");
 ?>
-
+<!-- MONTHLY STATISTICS -->
 <div class="container mt-5">
+
+    <!-- DASHBOARD OVERVIEW CARDS -->
     <div class="row">
         <h3>Monthly Statistics</h3>
         <!-- Dashboard Overview Cards -->
@@ -69,7 +94,7 @@ $recentBookings = $conn->query("
             <div class="card text-center">
                 <div class="card-body shadow">
                     <h5 class="card-title">Total Earnings</h5>
-                    <p class="card-text"><?= number_format($totalAmount, 2) ?> BWP</p>
+                    <p class="card-text">BWP<?= number_format($totalAmount, 2) ?></p>
                 </div>
             </div>
         </div>
@@ -82,49 +107,84 @@ $recentBookings = $conn->query("
             </div>
         </div>
     </div>
-
-    <!-- LINE CHART GRAPH -->
-    <div class="container my-5">
-        <div class="d-flex justify-content-center">
-            <div id="chart_div" style="width: 90%; height: 500px;"></div>
-        </div>
-    </div>
-
 </div>
 
-<!-- Google Charts -->
-<script type="text/javascript">
-    google.charts.load('current', { 'packages': ['corechart'] });
-    google.charts.setOnLoadCallback(drawChart);
+<!-- SALES CHART SECTION -->
+<div class="container mt-5">
+    <div id="sales_chart_div" class="chart-container"></div>
+</div>
+<br><br>
 
-    function drawChart() {
-        // Chart data in JSON format
+<style>
+    .chart-container {
+        width: 90%;
+        height: 500px;
+        margin: 0 auto;
+    }
+</style>
+
+<!-- Google Charts Script -->
+<script type="text/javascript">
+    google.charts.load('current', {
+        packages: ['corechart']
+    });
+    google.charts.setOnLoadCallback(drawSalesChart);
+
+    function drawSalesChart() {
         const rawData = <?php echo json_encode($chartData); ?>;
 
-        // Create a DataTable
-        const data = new google.visualization.DataTable();
-        data.addColumn('string', 'Month');
-        data.addColumn('number', 'Total Amount (BWP)');
-        data.addColumn('number', 'Total Bookings');
-
-        // Populate DataTable
+        // Data for sales chart
+        const salesData = new google.visualization.DataTable();
+        salesData.addColumn('string', 'Month');
+        salesData.addColumn('number', 'Total Sales (BWP)');
         rawData.forEach(item => {
-            data.addRow([item.month, item.total_amount, item.total_bookings]);
+            salesData.addRow([item.month, item.total_amount]);
         });
 
-        // Chart options
-        const options = {
-            title: 'Monthly Statistics',
-            hAxis: { title: 'Month', textStyle: { fontSize: 12 } },
-            vAxis: { title: 'Amount and Bookings', textStyle: { fontSize: 12 } },
-            seriesType: 'bars',
-            series: { 1: { type: 'line' } }, // Total Bookings as a line chart
-            legend: { position: 'bottom' },
+        const salesOptions = {
+            title: 'Monthly Sales',
+            titleTextStyle: {
+                fontSize: 25, // Set the desired font size for the title
+                bold: true, // Optionally make the title bold
+                color: '#333' // Optionally set a custom color for the title
+            },
+            hAxis: {
+                title: 'Month',
+                textStyle: {
+                    fontSize: 12
+                },
+                titleTextStyle: {
+                    fontSize: 14
+                }
+            },
+            vAxis: {
+                title: 'Sales (BWP)',
+                textStyle: {
+                    fontSize: 12
+                },
+                titleTextStyle: {
+                    fontSize: 14
+                },
+
+            },
+            legend: {
+                position: 'bottom'
+            },
+            colors: ['#FF5722'], // Custom line color (Orange)
+            curveType: 'function', // Smooth curve for the line chart
+            pointSize: 6, // Size of the points on the line
+            backgroundColor: '#f9f9f9', // Light background for the chart
+            tooltip: {
+                textStyle: {
+                    color: '#000', // Black text in tooltips
+                    fontSize: 12
+                },
+                showColorCode: true
+            }
         };
 
-        // Create and render the chart
-        const chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
-        chart.draw(data, options);
+        const salesChart = new google.visualization.LineChart(document.getElementById('sales_chart_div'));
+        salesChart.draw(salesData, salesOptions);
     }
 </script>
 
