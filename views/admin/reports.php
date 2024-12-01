@@ -3,6 +3,13 @@ include '../../components/header.php';
 include '../../components/navbar.php';
 include '../../backend/db_connection.php';
 
+// Handle Export Request
+if (isset($_POST['export'])) {
+    $exportType = $_POST['export'];
+    include 'export_reports.php'; // Separate file for handling export
+    exit;
+}
+
 // Get selected month and year from the filter form, default to the current month and year
 $selectedMonth = $_POST['month'] ?? date('m');
 $selectedYear = $_POST['year'] ?? date('Y');
@@ -84,10 +91,20 @@ foreach ($guestsByCountry as $row) {
                 </select>
             </div>
             <div class="col-md-4 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary">Generate Report</button>
+                <button type="submit" class="btn btn-primary me-4">Generate Report</button>
+
+                <!-- Export Options -->
+                <form method="POST">
+                    <input type="hidden" name="month" value="<?= $selectedMonth ?>">
+                    <input type="hidden" name="year" value="<?= $selectedYear ?>">
+                    <button type="submit" name="export" value="excel" class="btn btn-success">Export to Excel</button>
+                    <!-- <button type="submit" name="export" value="pdf" class="btn btn-danger">Export to PDF</button> -->
+                </form>
             </div>
         </div>
     </form>
+
+    <hr>
 
     <!-- 1. Statistics for the selected month and year -->
     <h4>Statistics for <?= date('F', mktime(0, 0, 0, $selectedMonth, 1)) ?> <?= $selectedYear ?></h4>
