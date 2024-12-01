@@ -261,6 +261,8 @@ if ($result && $result->num_rows > 0) {
 </style>
 
 <script>
+
+    // CALENDAR BOOKING LISTENER
     document.addEventListener("DOMContentLoaded", function () {
     const bookings = <?= json_encode($bookings) ?>; // Booking data from PHP
     const calendarEl = document.getElementById("calendar");
@@ -349,6 +351,7 @@ if ($result && $result->num_rows > 0) {
         renderCalendar(currentDate);
     });
 
+    // VIEW PREVIOUS & NEXT MONTHS 
     nextMonthBtn.addEventListener("click", function () {
         currentDate.setMonth(currentDate.getMonth() + 1);
         renderCalendar(currentDate);
