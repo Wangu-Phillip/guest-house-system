@@ -28,10 +28,14 @@ if ($result && $result->num_rows > 0) {
 ?>
 
 <div class="container mt-5">
-    <h2 class="mb-4"><?= date('F j, Y');?></h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <button id="prevMonth" class="btn btn-dark">Previous</button>
+        <h2 id="currentMonth"></h2>
+        <button id="nextMonth" class="btn btn-dark">Next</button>
+    </div>
     <div id="calendar"></div>
 </div>
-
+<br><br>
 
 <style>
     #calendar {
@@ -42,7 +46,6 @@ if ($result && $result->num_rows > 0) {
         background: #fff;
         border: #fff 5px solid;
         border-radius: 5px;
-
     }
 
     .day {
@@ -51,22 +54,15 @@ if ($result && $result->num_rows > 0) {
         border-radius: 5px;
         padding: 5px;
         position: relative;
-        /* box-shadow: offset-x offset-y blur-radius spread-radius color; */
         box-shadow: -1px 8px 10px rgba(0, 0, 0, 0.1);
         overflow-y: auto;
-        /* Adds vertical scroll only when needed */
         max-height: 100px;
-        /* Define a maximum height for scrolling */
         scrollbar-width: none;
-        /* Hide scrollbar in Firefox */
         -ms-overflow-style: none;
-        /* Hide scrollbar in Internet Explorer 10+ */
-
     }
 
     .day::-webkit-scrollbar {
         display: none;
-        /* Hide scrollbar in WebKit browsers (Chrome, Safari) */
     }
 
     .day .date {
@@ -82,76 +78,97 @@ if ($result && $result->num_rows > 0) {
         border-radius: 3px;
         font-size: 12px;
         box-shadow: 5px 8px 15px rgba(0, 0, 0, 0.1);
-
     }
 </style>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-    const bookings = <?= json_encode($bookings) ?>; // Booking data from PHP
-    const calendarEl = document.getElementById("calendar");
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = today.getMonth(); // 0-indexed for JavaScript (0 = January)
-    const currentDay = today.getDate(); // Get the current day of the month
+        const bookings = <?= json_encode($bookings) ?>; // Booking data from PHP
+        const calendarEl = document.getElementById("calendar");
+        const currentMonthEl = document.getElementById("currentMonth");
+        const prevMonthBtn = document.getElementById("prevMonth");
+        const nextMonthBtn = document.getElementById("nextMonth");
 
-    // Days in the current month
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
+        let currentDate = new Date(); // Initialize to today's date
 
-    // First day of the month (0 = Sunday, 1 = Monday, ...)
-    const firstDay = new Date(year, month, 1).getDay();
+        function renderCalendar(date) {
+            calendarEl.innerHTML = ""; // Clear the existing calendar
+            const year = date.getFullYear();
+            const month = date.getMonth(); // 0-indexed for JavaScript (0 = January)
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const firstDay = new Date(year, month, 1).getDay();
 
-    // Render blank days for the previous month
-    for (let i = 0; i < firstDay; i++) {
-        const blankEl = document.createElement("div");
-        blankEl.classList.add("day");
-        blankEl.style.background = "#f9f9f9"; // Lighter background for blank days
-        calendarEl.appendChild(blankEl);
-    }
+            // Set the current month and year in the header
+            currentMonthEl.textContent = date.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+            });
 
-    // Render calendar days
-    for (let i = 1; i <= daysInMonth; i++) {
-        const dayEl = document.createElement("div");
-        dayEl.classList.add("day");
-        dayEl.dataset.date = `${year}-${String(month + 1).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
+            // Render blank days for the previous month
+            for (let i = 0; i < firstDay; i++) {
+                const blankEl = document.createElement("div");
+                blankEl.classList.add("day");
+                blankEl.style.background = "#f9f9f9"; // Lighter background for blank days
+                calendarEl.appendChild(blankEl);
+            }
 
-        // Highlight the current day
-        if (i === currentDay) {
-            dayEl.style.background = "lightblue"; // Highlight the current day
+            // Render calendar days
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayEl = document.createElement("div");
+                dayEl.classList.add("day");
+                dayEl.dataset.date = `${year}-${String(month + 1).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
+
+                // Highlight today's date
+                if (new Date().toDateString() === new Date(year, month, i).toDateString()) {
+                    dayEl.style.background = "lightblue"; // Highlight the current day
+                }
+
+                // Add day number
+                const dateEl = document.createElement("div");
+                dateEl.classList.add("date");
+                dateEl.innerText = i;
+                dayEl.appendChild(dateEl);
+
+                // Add events if they exist
+                bookings.forEach((booking) => {
+                    if (booking.date === dayEl.dataset.date) {
+                        const eventEl = document.createElement("div");
+                        eventEl.classList.add("event");
+                        eventEl.innerText = booking.title;
+                        dayEl.appendChild(eventEl);
+                    }
+                });
+
+                calendarEl.appendChild(dayEl);
+            }
+
+            // Fill remaining days to complete the week (if needed)
+            const totalDays = firstDay + daysInMonth;
+            const remainingDays = 7 - (totalDays % 7);
+            if (remainingDays < 7) {
+                for (let i = 0; i < remainingDays; i++) {
+                    const blankEl = document.createElement("div");
+                    blankEl.classList.add("day");
+                    blankEl.style.background = "#f9f9f9"; // Lighter background for blank days
+                    calendarEl.appendChild(blankEl);
+                }
+            }
         }
 
-        // Add day number
-        const dateEl = document.createElement("div");
-        dateEl.classList.add("date");
-        dateEl.innerText = i;
-        dayEl.appendChild(dateEl);
-
-        // Add events if they exist
-        bookings.forEach((booking) => {
-            if (booking.date === dayEl.dataset.date) {
-                const eventEl = document.createElement("div");
-                eventEl.classList.add("event");
-                eventEl.innerText = booking.title;
-                dayEl.appendChild(eventEl);
-            }
+        // Event listeners for navigation buttons
+        prevMonthBtn.addEventListener("click", function () {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar(currentDate);
         });
 
-        calendarEl.appendChild(dayEl);
-    }
+        nextMonthBtn.addEventListener("click", function () {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar(currentDate);
+        });
 
-    // Fill remaining days to complete the week (if needed)
-    const totalDays = firstDay + daysInMonth;
-    const remainingDays = 7 - (totalDays % 7);
-    if (remainingDays < 7) {
-        for (let i = 0; i < remainingDays; i++) {
-            const blankEl = document.createElement("div");
-            blankEl.classList.add("day");
-            blankEl.style.background = "#f9f9f9"; // Lighter background for blank days
-            calendarEl.appendChild(blankEl);
-        }
-    }
-});
-
+        // Initial render
+        renderCalendar(currentDate);
+    });
 </script>
 
 <?php include '../../components/footer.php'; ?>
