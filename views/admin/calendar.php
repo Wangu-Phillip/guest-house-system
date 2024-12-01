@@ -7,8 +7,12 @@ include '../../backend/db_connection.php';
 $sql = "SELECT b.booking_id, DATE(b.date) AS date, CONCAT(g.firstname, ' ', g.lastname) AS guest_name, r.room_number
         FROM bookings b
         LEFT JOIN guests g ON b.guest_id = g.guest_id
-        LEFT JOIN rooms r ON b.room_id = r.room_id";
+        LEFT JOIN rooms r ON b.room_id = r.room_id
+        WHERE (b.check_in IS NOT NULL OR b.check_in != '0000-00-00 00:00:00')
+        AND (b.check_out IS NULL OR b.check_out = '0000-00-00 00:00:00')";
 $result = $conn->query($sql);
+
+
 
 // Prepare bookings for the calendar
 $bookings = [];
@@ -48,7 +52,20 @@ if ($result && $result->num_rows > 0) {
         position: relative;
         /* box-shadow: offset-x offset-y blur-radius spread-radius color; */
         box-shadow: -1px 8px 10px rgba(0, 0, 0, 0.1);
+        overflow-y: auto;
+        /* Adds vertical scroll only when needed */
+        max-height: 100px;
+        /* Define a maximum height for scrolling */
+        scrollbar-width: none;
+        /* Hide scrollbar in Firefox */
+        -ms-overflow-style: none;
+        /* Hide scrollbar in Internet Explorer 10+ */
 
+    }
+
+    .day::-webkit-scrollbar {
+        display: none;
+        /* Hide scrollbar in WebKit browsers (Chrome, Safari) */
     }
 
     .day .date {
@@ -76,8 +93,19 @@ if ($result && $result->num_rows > 0) {
         const year = today.getFullYear();
         const month = today.getMonth(); // 0-indexed for JavaScript (0 = January)
 
-        // Days in the month
+        // Days in the current month
         const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        // First day of the month (0 = Sunday, 1 = Monday, ...)
+        const firstDay = new Date(year, month, 1).getDay();
+
+        // Render blank days for the previous month
+        for (let i = 0; i < firstDay; i++) {
+            const blankEl = document.createElement("div");
+            blankEl.classList.add("day");
+            blankEl.style.background = "#f9f9f9"; // Lighter background for blank days
+            calendarEl.appendChild(blankEl);
+        }
 
         // Render calendar days
         for (let i = 1; i <= daysInMonth; i++) {
@@ -102,6 +130,18 @@ if ($result && $result->num_rows > 0) {
             });
 
             calendarEl.appendChild(dayEl);
+        }
+
+        // Fill remaining days to complete the week (if needed)
+        const totalDays = firstDay + daysInMonth;
+        const remainingDays = 7 - (totalDays % 7);
+        if (remainingDays < 7) {
+            for (let i = 0; i < remainingDays; i++) {
+                const blankEl = document.createElement("div");
+                blankEl.classList.add("day");
+                blankEl.style.background = "#f9f9f9"; // Lighter background for blank days
+                calendarEl.appendChild(blankEl);
+            }
         }
     });
 </script>
