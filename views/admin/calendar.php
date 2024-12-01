@@ -28,9 +28,10 @@ if ($result && $result->num_rows > 0) {
 ?>
 
 <div class="container mt-5">
-    <h2 class="mb-4">Bookings Calendar</h2>
+    <h2 class="mb-4"><?= date('F j, Y');?></h2>
     <div id="calendar"></div>
 </div>
+
 
 <style>
     #calendar {
