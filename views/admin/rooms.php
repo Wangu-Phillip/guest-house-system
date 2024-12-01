@@ -9,12 +9,13 @@ include '../../backend/db_connection.php';
 
 <!-- SEARCH INPUT FIELD -->
 <div class="container my-3">
-    <div class="row d-flex justify-content-end">
 
-        <!-- Button trigger modal -->
-        <a href="#" data-bs-toggle="modal" data-bs-target="#addProductModal">
-            <button type="button" class="btn btn-primary text-end">Add a room</button>
-        </a>
+    <!-- Button trigger modal -->
+    <a href="#" data-bs-toggle="modal" data-bs-target="#addProductModal">
+        <button type="button" class="btn btn-primary text-end">Add a room</button>
+    </a>
+    
+    <div class="row d-flex justify-content-end">
 
         <!-- SEARCH INPUT FIELD -->
         <div class="col-md-4">
@@ -30,7 +31,6 @@ include '../../backend/db_connection.php';
 
 <!-- ROOMS SECTION START -->
 <section class="container">
-
     <div class="applications-table border rounded">
         <div id="productTable">
             <table class="table table-striped">
