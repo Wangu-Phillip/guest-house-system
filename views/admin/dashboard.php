@@ -86,7 +86,7 @@ $recentBookings = $conn->query("
             <div class="card text-center shadow">
                 <div class="card-body">
                     <h5 class="card-title">Total Guests</h5>
-                    <p class="card-text"><?= $totalGuests ?></p>
+                    <p class="card-text"><?= $totalGuests == null ? 0 : $totalGuests ?></p>
                 </div>
             </div>
         </div>
