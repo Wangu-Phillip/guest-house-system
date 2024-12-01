@@ -3,11 +3,11 @@ include '../../components/header.php';
 include '../../components/navbar.php';
 include '../../backend/db_connection.php';
 
-// Set the current month and year
-$currentMonth = date('m');
-$currentYear = date('Y');
+// Get selected month and year from the filter form, default to the current month and year
+$selectedMonth = $_POST['month'] ?? date('m');
+$selectedYear = $_POST['year'] ?? date('Y');
 
-// 1. Statistics for the current month and year
+// 1. Statistics for the selected month and year
 $statistics = $conn->query("
     SELECT 
         COUNT(DISTINCT g.guest_id) AS total_guests,
@@ -16,11 +16,10 @@ $statistics = $conn->query("
     FROM bookings b
     JOIN guests g ON b.guest_id = g.guest_id
     JOIN rooms r ON b.room_id = r.room_id
-    WHERE MONTH(b.date) = $currentMonth AND YEAR(b.date) = $currentYear
+    WHERE MONTH(b.date) = $selectedMonth AND YEAR(b.date) = $selectedYear
 ")->fetch_assoc();
 
-// 2. Total salaries for the month
-// Assuming you have a `salaries` table, modify this query to match your actual schema
+// 2. Total salaries for the month (assuming a salaries table)
 $totalSalaries = $conn->query("
     SELECT SUM(salary) AS total_salaries
     FROM users
@@ -30,7 +29,7 @@ $totalSalaries = $conn->query("
 $totalRevenue = $conn->query("
     SELECT SUM(r.price) AS total_revenue
     FROM bookings b, rooms r
-    WHERE MONTH(b.check_out) = $currentMonth AND YEAR(b.check_out) = $currentYear
+    WHERE MONTH(b.check_out) = $selectedMonth AND YEAR(b.check_out) = $selectedYear
     AND b.room_id = r.room_id
 ")->fetch_assoc()['total_revenue'] ?? 0;
 
@@ -38,6 +37,7 @@ $totalRevenue = $conn->query("
 $guestsByCountry = $conn->query("
     SELECT country, COUNT(*) AS total_guests
     FROM guests
+    WHERE MONTH(created_At) = $selectedMonth AND YEAR(created_At) = $selectedYear
     GROUP BY country
     ORDER BY total_guests DESC
 ")->fetch_all(MYSQLI_ASSOC);
@@ -46,6 +46,7 @@ $guestsByCountry = $conn->query("
 $totalGuests = $conn->query("
     SELECT COUNT(*) AS total_guests
     FROM guests
+    WHERE MONTH(created_At) = $selectedMonth AND YEAR(created_At) = $selectedYear
 ")->fetch_assoc()['total_guests'];
 
 $guestsPercentageByCountry = [];
@@ -61,8 +62,35 @@ foreach ($guestsByCountry as $row) {
     <h2>System Reports</h2>
     <hr>
 
-    <!-- 1. Statistics for the current month and year -->
-    <h4>Statistics for <?= date('F Y') ?></h4>
+    <!-- Filter Form -->
+    <form method="POST" class="mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                <label for="month" class="form-label">Select Month</label>
+                <select name="month" id="month" class="form-select">
+                    <?php for ($m = 1; $m <= 12; $m++): ?>
+                        <option value="<?= str_pad($m, 2, '0', STR_PAD_LEFT) ?>" <?= $m == $selectedMonth ? 'selected' : '' ?>>
+                            <?= date('F', mktime(0, 0, 0, $m, 1)) ?>
+                        </option>
+                    <?php endfor; ?>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="year" class="form-label">Select Year</label>
+                <select name="year" id="year" class="form-select">
+                    <?php for ($y = date('Y'); $y >= date('Y') - 10; $y--): ?>
+                        <option value="<?= $y ?>" <?= $y == $selectedYear ? 'selected' : '' ?>><?= $y ?></option>
+                    <?php endfor; ?>
+                </select>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">Generate Report</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- 1. Statistics for the selected month and year -->
+    <h4>Statistics for <?= date('F', mktime(0, 0, 0, $selectedMonth, 1)) ?> <?= $selectedYear ?></h4>
     <table class="table table-bordered">
         <thead class="table-dark">
             <tr>
@@ -81,11 +109,11 @@ foreach ($guestsByCountry as $row) {
     </table>
 
     <!-- 2. Total Salaries for the Month -->
-    <h4>Total Salaries for <?= date('F Y') ?></h4>
+    <h4>Total Salaries for <?= date('F', mktime(0, 0, 0, $selectedMonth, 1)) ?> <?= $selectedYear ?></h4>
     <p>Total Salaries Paid: <?= number_format($totalSalaries, 2) ?> BWP</p>
 
     <!-- 3. Turnover or Total Revenue for the Month -->
-    <h4>Turnover for <?= date('F Y') ?></h4>
+    <h4>Turnover for <?= date('F', mktime(0, 0, 0, $selectedMonth, 1)) ?> <?= $selectedYear ?></h4>
     <p>Total Revenue from Accommodation: <?= number_format($totalRevenue, 2) ?> BWP</p>
 
     <!-- 4. Number of Guests by Country -->
@@ -126,6 +154,6 @@ foreach ($guestsByCountry as $row) {
         </tbody>
     </table>
 </div>
-<br><br>
 
+<br><br>
 <?php include '../../components/footer.php'; ?>
