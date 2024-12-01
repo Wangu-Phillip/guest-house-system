@@ -92,16 +92,16 @@ foreach ($guestsByCountry as $row) {
             </div>
             <div class="col-md-4 d-flex align-items-end">
                 <button type="submit" class="btn btn-primary me-4">Generate Report</button>
-
-                <!-- Export Options -->
-                <form method="POST">
-                    <input type="hidden" name="month" value="<?= $selectedMonth ?>">
-                    <input type="hidden" name="year" value="<?= $selectedYear ?>">
-                    <button type="submit" name="export" value="excel" class="btn btn-success">Export to Excel</button>
-                    <!-- <button type="submit" name="export" value="pdf" class="btn btn-danger">Export to PDF</button> -->
-                </form>
             </div>
         </div>
+    </form>
+
+    <!-- Export Options -->
+    <form method="POST">
+        <input type="hidden" name="month" value="<?= $selectedMonth ?>">
+        <input type="hidden" name="year" value="<?= $selectedYear ?>">
+        <button type="submit" name="export" value="excel" class="btn btn-success">Export to Excel</button>
+        <!-- <button type="submit" name="export" value="pdf" class="btn btn-danger">Export to PDF</button> -->
     </form>
 
     <hr>
