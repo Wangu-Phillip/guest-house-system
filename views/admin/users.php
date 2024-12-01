@@ -31,9 +31,9 @@ include '../../components/navbar.php';
         <div class="row">
             <div class="col">
                 <div id="usersTable">
-                    <div class="applications-table border rounded-2">
-                        <table class="table table-striped">
-                            <thead>
+                    <div class="applications-table border border-secondary shadow-sm rounded-4" style="overflow: hidden;">
+                        <table class="table table-hover table-striped">
+                            <thead class="table-dark">
                                 <tr>
                                     <th>#</th>
                                     <th>Employee Name</th>
@@ -67,7 +67,7 @@ include '../../components/navbar.php';
                                         echo "<td>" . $row["status"] . "</td>";
                                         echo "<td>" . $row["salary"] . "</td>";
                                         echo "<td>";
-                                        echo "<button class='btn btn-warning btn-sm' onclick=\"editUser(
+                                        echo "<button class='btn btn-warning btn-sm shadow' onclick=\"editUser(
                                                     '{$row['user_id']}', 
                                                     '{$row['firstname']}', 
                                                     '{$row['lastname']}', 
@@ -78,7 +78,7 @@ include '../../components/navbar.php';
                                                 )\">Edit</button> ";
                                         echo "<form method='post' action='../../backend/delete_user.php' style='display:inline;'>";
                                         echo "<input type='hidden' name='delete' value='" . $row["email"] . "'>";
-                                        echo "<input class='btn btn-danger btn-sm' type='submit' value='Delete'>";
+                                        echo "<input class='btn btn-danger btn-sm shadow' type='submit' value='Delete'>";
                                         echo "</form>";
                                         echo "</td>";
 

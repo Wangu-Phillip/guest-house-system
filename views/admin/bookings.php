@@ -64,55 +64,74 @@ $result = $conn->query($sql);
 
 <!-- BOOKINGS SECTION START -->
 <div class="container mt-2">
-    <table class="table table-hover table-striped" id="bookingsTable">
-        <thead class="table-success">
-            <tr>
-                <th>Date</th>
-                <th>Guest Name</th>
-                <th>Guest Number</th>
-                <th>Guest ID (Omang)</th>
-                <th>Room</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Check-In Date/Time</th>
-                <th>Check-Out Date/Time</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if ($result && $result->num_rows > 0): ?>
-                <?php while ($row = $result->fetch_assoc()): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($row['date']) ?></td>
-                        <td><?= htmlspecialchars($row['guest_name']) ?></td>
-                        <td><?= htmlspecialchars($row['guest_number']) ?></td>
-                        <td><?= htmlspecialchars($row['guest_id']) ?></td>
-                        <td><?= htmlspecialchars($row['room_number']) ?></td>
-                        <td><?= htmlspecialchars($row['amount']) ?></td>
-                        <td><?= htmlspecialchars($row['status']) ?></td>
-                        <td><?= htmlspecialchars($row['check_in']) ?: '-' ?></td>
-                        <td><?= htmlspecialchars($row['check_out']) ?: '-' ?></td>
-                        <td>
-                            <form action="../../backend/delete_booking.php" method="post" style="display: inline;">
-                                <input type="hidden" name="delete" value="<?= $row['booking_id'] ?>">
-                                <button type="submit" class="btn btn-danger btn-sm">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
-                        </td>
-
-                    </tr>
-                <?php endwhile; ?>
-            <?php else: ?>
+    <!-- Table Wrapper for Rounded Corners -->
+    <div class="rounded border border-secondary shadow-sm" style="overflow: hidden;">
+        <table class="table table-hover table-striped mb-0" id="bookingsTable">
+            <thead class="table-dark">
                 <tr>
-                    <td colspan="10" class="text-center text-muted">No bookings found</td>
+                    <th>Date</th>
+                    <th>Guest Name</th>
+                    <th>Guest Number</th>
+                    <th>Guest ID (Omang)</th>
+                    <th>Room</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Check-In Date/Time</th>
+                    <th>Check-Out Date/Time</th>
+                    <th>Action</th>
                 </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
-
-
+            </thead>
+            <tbody>
+                <?php if ($result && $result->num_rows > 0): ?>
+                    <?php while ($row = $result->fetch_assoc()): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($row['date']) ?></td>
+                            <td><?= htmlspecialchars($row['guest_name']) ?></td>
+                            <td><?= htmlspecialchars($row['guest_number']) ?></td>
+                            <td><?= htmlspecialchars($row['guest_id']) ?></td>
+                            <td><?= htmlspecialchars($row['room_number']) ?></td>
+                            <td><?= htmlspecialchars($row['amount']) ?></td>
+                            <td><?= htmlspecialchars($row['status']) ?></td>
+                            <td><?= htmlspecialchars($row['check_in']) ?: '-' ?></td>
+                            <td><?= htmlspecialchars($row['check_out']) ?: '-' ?></td>
+                            <td>
+                                <form action="../../backend/delete_booking.php" method="post" style="display: inline;">
+                                    <input type="hidden" name="delete" value="<?= $row['booking_id'] ?>">
+                                    <button type="submit" class="btn btn-danger btn-sm shadow">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="10" class="text-center text-muted">No bookings found</td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
 </div>
+
+<style>
+    /* Add rounded corners and border for table wrapper */
+    .rounded {
+        border-radius: 10px !important; /* Ensure border radius applies */
+    }
+
+    /* Optional: Add padding or background styling for the container */
+    .rounded {
+        background-color: #f8f9fa; /* Light grey background */
+    }
+
+    /* Optional: Style the table header for consistent design */
+    thead.table-dark thead {
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    } 
+</style>
+
 
 <!-- CREATE BOOKING MODAL -->
 <div class="modal fade" id="createBookingModal" tabindex="-1" aria-labelledby="createBookingModalLabel" aria-hidden="true">

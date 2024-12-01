@@ -136,13 +136,13 @@ $recentBookings = $conn->query("
         // Data for sales chart
         const salesData = new google.visualization.DataTable();
         salesData.addColumn('string', 'Month');
-        salesData.addColumn('number', 'Total Sales (BWP)');
+        salesData.addColumn('number', 'Total Revenue (BWP)');
         rawData.forEach(item => {
             salesData.addRow([item.month, item.total_amount]);
         });
 
         const salesOptions = {
-            title: 'Monthly Sales',
+            title: 'Monthly Revenue',
             titleTextStyle: {
                 fontSize: 25, // Set the desired font size for the title
                 bold: true, // Optionally make the title bold

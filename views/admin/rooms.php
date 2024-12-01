@@ -31,10 +31,10 @@ include '../../backend/db_connection.php';
 
 <!-- ROOMS SECTION START -->
 <section class="container">
-    <div class="applications-table border rounded">
+    <div class="applications-table border rounded-4 border-secondary shadow-sm " style="overflow: hidden;">
         <div id="productTable">
-            <table class="table table-striped">
-                <thead>
+            <table class="table table-hover table-striped">
+                <thead class="table-dark">
                     <tr>
                         <th>#</th>
                         <th>Room Type</th>
@@ -60,7 +60,7 @@ include '../../backend/db_connection.php';
                                 <td><?php echo $row['price']; ?></td>
                                 <td>
                                     <button
-                                        class="btn btn-warning btn-sm"
+                                        class="btn btn-warning btn-sm shadow"
                                         onclick="editProduct(
                                             '<?php echo $row['room_id']; ?>', 
                                             '<?php echo $row['room_Type']; ?>', 
@@ -71,7 +71,7 @@ include '../../backend/db_connection.php';
                                     </button>
                                     <form action="../../backend/delete_room.php" method="post" style="display:inline;">
                                         <input type="hidden" name="room_id" value="<?php echo $row['room_id']; ?>">
-                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                        <button type="submit" class="btn btn-danger btn-sm shadow">Delete</button>
                                     </form>
                                 </td>
                             </tr>
