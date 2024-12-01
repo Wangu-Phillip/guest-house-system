@@ -87,64 +87,71 @@ if ($result && $result->num_rows > 0) {
 </style>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const bookings = <?= json_encode($bookings) ?>; // Booking data from PHP
-        const calendarEl = document.getElementById("calendar");
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = today.getMonth(); // 0-indexed for JavaScript (0 = January)
+    document.addEventListener("DOMContentLoaded", function () {
+    const bookings = <?= json_encode($bookings) ?>; // Booking data from PHP
+    const calendarEl = document.getElementById("calendar");
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth(); // 0-indexed for JavaScript (0 = January)
+    const currentDay = today.getDate(); // Get the current day of the month
 
-        // Days in the current month
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
+    // Days in the current month
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-        // First day of the month (0 = Sunday, 1 = Monday, ...)
-        const firstDay = new Date(year, month, 1).getDay();
+    // First day of the month (0 = Sunday, 1 = Monday, ...)
+    const firstDay = new Date(year, month, 1).getDay();
 
-        // Render blank days for the previous month
-        for (let i = 0; i < firstDay; i++) {
+    // Render blank days for the previous month
+    for (let i = 0; i < firstDay; i++) {
+        const blankEl = document.createElement("div");
+        blankEl.classList.add("day");
+        blankEl.style.background = "#f9f9f9"; // Lighter background for blank days
+        calendarEl.appendChild(blankEl);
+    }
+
+    // Render calendar days
+    for (let i = 1; i <= daysInMonth; i++) {
+        const dayEl = document.createElement("div");
+        dayEl.classList.add("day");
+        dayEl.dataset.date = `${year}-${String(month + 1).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
+
+        // Highlight the current day
+        if (i === currentDay) {
+            dayEl.style.background = "lightblue"; // Highlight the current day
+        }
+
+        // Add day number
+        const dateEl = document.createElement("div");
+        dateEl.classList.add("date");
+        dateEl.innerText = i;
+        dayEl.appendChild(dateEl);
+
+        // Add events if they exist
+        bookings.forEach((booking) => {
+            if (booking.date === dayEl.dataset.date) {
+                const eventEl = document.createElement("div");
+                eventEl.classList.add("event");
+                eventEl.innerText = booking.title;
+                dayEl.appendChild(eventEl);
+            }
+        });
+
+        calendarEl.appendChild(dayEl);
+    }
+
+    // Fill remaining days to complete the week (if needed)
+    const totalDays = firstDay + daysInMonth;
+    const remainingDays = 7 - (totalDays % 7);
+    if (remainingDays < 7) {
+        for (let i = 0; i < remainingDays; i++) {
             const blankEl = document.createElement("div");
             blankEl.classList.add("day");
             blankEl.style.background = "#f9f9f9"; // Lighter background for blank days
             calendarEl.appendChild(blankEl);
         }
+    }
+});
 
-        // Render calendar days
-        for (let i = 1; i <= daysInMonth; i++) {
-            const dayEl = document.createElement("div");
-            dayEl.classList.add("day");
-            dayEl.dataset.date = `${year}-${String(month + 1).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
-
-            // Add day number
-            const dateEl = document.createElement("div");
-            dateEl.classList.add("date");
-            dateEl.innerText = i;
-            dayEl.appendChild(dateEl);
-
-            // Add events if they exist
-            bookings.forEach((booking) => {
-                if (booking.date === dayEl.dataset.date) {
-                    const eventEl = document.createElement("div");
-                    eventEl.classList.add("event");
-                    eventEl.innerText = booking.title;
-                    dayEl.appendChild(eventEl);
-                }
-            });
-
-            calendarEl.appendChild(dayEl);
-        }
-
-        // Fill remaining days to complete the week (if needed)
-        const totalDays = firstDay + daysInMonth;
-        const remainingDays = 7 - (totalDays % 7);
-        if (remainingDays < 7) {
-            for (let i = 0; i < remainingDays; i++) {
-                const blankEl = document.createElement("div");
-                blankEl.classList.add("day");
-                blankEl.style.background = "#f9f9f9"; // Lighter background for blank days
-                calendarEl.appendChild(blankEl);
-            }
-        }
-    });
 </script>
 
 <?php include '../../components/footer.php'; ?>
