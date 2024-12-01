@@ -35,7 +35,7 @@ if ($result && $result->num_rows > 0) {
                 <h5 class="modal-title" id="createBookingModalLabel">Create Booking</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="../../backend/save_booking.php" method="post">
+            <form action="../../backend/calendar_booking.php" method="post">
                 <div class="modal-body">
                     <!-- Guest Details -->
                     <div id="section1" class="row" style="display: block;">
