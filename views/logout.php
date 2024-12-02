@@ -15,7 +15,7 @@
 * instructing it to load the specified login.php page. The execution of the current 
 * script ends here, and the user is redirected to the login page.
 */
-@include "config.php"; // include the config file in the current script 
+@include "../backend/db_connection.php"; // include the config file in the current script 
 
 session_start(); // start a new session or resume an existing session 
 session_unset(); // free all session variables currently registered 

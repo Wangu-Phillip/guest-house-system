@@ -31,14 +31,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
                     header("Location: ../views/admin/dashboard.php?success=Welcome back, {$user['firstname']}!");
                     exit();
-                } elseif ($row["role"] == "employee") {
+                } elseif ($_SESSION["role"] == "employee") {
         
                     $_SESSION['employeeFname'] = $user['firstname'];
                     $_SESSION['employeeLname'] = $user['lastname'];
                     $_SESSION["employee_email"] = $row["email"];
                     $_SESSION["employee_id"] = $user["user_id"];
         
-                    header("Location: ../views/admin/dashboard.php?success=Welcome back, {$user['firstname']}!");
+                    header("Location: ../views/admin/bookings.php?success=Welcome back, {$user['firstname']}!");
                     exit();
                 }
 
