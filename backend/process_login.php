@@ -21,6 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (password_verify($password, $user['password'])) {
                 // Set session variables
                 $_SESSION['role'] = $user['role'];
+                $_SESSION['user'] = $user['user_id'];
+
 
                 if ($_SESSION["role"] == "admin") {
 

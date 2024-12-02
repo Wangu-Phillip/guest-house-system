@@ -1,4 +1,14 @@
 <?php
+
+session_start();
+
+// Check if the user is logged in
+if (!isset($_SESSION['user'])) {
+    // Redirect to login page
+    header("Location: ../../views/login.php");
+    exit(); // Stop further execution of the script
+}
+
 include '../../backend/db_connection.php';
 
 // Get selected month and year from POST request
