@@ -95,6 +95,12 @@ $result = $conn->query($sql);
                             <td><?= htmlspecialchars($row['check_in']) ?: '-' ?></td>
                             <td><?= htmlspecialchars($row['check_out']) ?: '-' ?></td>
                             <td>
+                                <button
+                                    type="button"
+                                    class="btn btn-warning btn-sm shadow"
+                                    onclick="openEditModal(<?= htmlspecialchars(json_encode($row)) ?>)">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
                                 <form action="../../backend/delete_booking.php" method="post" style="display: inline;">
                                     <input type="hidden" name="delete" value="<?= $row['booking_id'] ?>">
                                     <button type="submit" class="btn btn-danger btn-sm shadow">
@@ -117,19 +123,21 @@ $result = $conn->query($sql);
 <style>
     /* Add rounded corners and border for table wrapper */
     .rounded {
-        border-radius: 10px !important; /* Ensure border radius applies */
+        border-radius: 10px !important;
+        /* Ensure border radius applies */
     }
 
     /* Optional: Add padding or background styling for the container */
     .rounded {
-        background-color: #f8f9fa; /* Light grey background */
+        background-color: #f8f9fa;
+        /* Light grey background */
     }
 
     /* Optional: Style the table header for consistent design */
     thead.table-dark thead {
         border-top-left-radius: 10px;
         border-top-right-radius: 10px;
-    } 
+    }
 </style>
 
 
@@ -310,6 +318,47 @@ $result = $conn->query($sql);
     </div>
 </div>
 
+<!-- EDIT BOOKING MODAL -->
+<div class="modal fade" id="editBookingModal" tabindex="-1" aria-labelledby="editBookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editBookingModalLabel">Edit Booking</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="../../backend/update_booking.php" method="post">
+                <div class="modal-body">
+                    <input type="hidden" name="booking_id" id="editBookingId">
+
+                    <div class="mb-3">
+                        <label for="editStatus" class="form-label">Status</label>
+                        <select class="form-select" id="editStatus" name="status" required>
+                            <option value="Pending">Pending</option>
+                            <option value="Checked Out">Checked out</option>
+                            <option value="Cancelled">Cancelled</option>
+                            <option value="Checked In">Checked In</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editCheckIn" class="form-label">Check-In</label>
+                        <input type="datetime-local" class="form-control" id="editCheckIn" name="check_in">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editCheckOut" class="form-label">Check-Out</label>
+                        <input type="datetime-local" class="form-control" id="editCheckOut" name="check_out">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Save Changes</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 
 <!--Bootstrap JS-->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -415,6 +464,32 @@ $result = $conn->query($sql);
         showToast(true, urlParams.get("success"), 5000);
     } else if (urlParams.has("error")) {
         showToast(false, urlParams.get("error"), 5000);
+    }
+
+    // DISPLAY EDIT MODAL
+    function openEditModal(row) {
+        document.getElementById("editBookingId").value = row.booking_id;
+        document.getElementById("editStatus").value = row.status;
+
+        // Format the check-in and check-out values for datetime-local
+        document.getElementById("editCheckIn").value = formatDatetimeForInput(row.check_in);
+        document.getElementById("editCheckOut").value = formatDatetimeForInput(row.check_out);
+
+        // Show the modal
+        var editModal = new bootstrap.Modal(document.getElementById("editBookingModal"));
+        editModal.show();
+    }
+
+    // Function to format date for datetime-local input
+    function formatDatetimeForInput(datetime) {
+        if (!datetime) return ''; // Return empty if no date is provided
+        const date = new Date(datetime);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
     }
 </script>
 
