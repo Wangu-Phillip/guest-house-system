@@ -50,7 +50,7 @@ $result = $conn->query($sql);
         <button type="button" class="btn btn-primary text-end">Create Booking</button>
     </a>
 
-    <div class="row d-flex justify-content-end">
+    <div class="row d-flex justify-content-end mt-2">
         <div class="col-md-4">
             <input
                 type="text"
@@ -66,59 +66,62 @@ $result = $conn->query($sql);
 <div class="container mt-2">
     <!-- Table Wrapper for Rounded Corners -->
     <div class="rounded border border-secondary shadow-sm" style="overflow: hidden;">
-        <table class="table table-hover table-striped mb-0" id="bookingsTable">
-            <thead class="table-dark">
-                <tr>
-                    <th>Date</th>
-                    <th>Guest Name</th>
-                    <th>Guest Number</th>
-                    <th>Guest ID (Omang)</th>
-                    <th>Room</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Check-In Date/Time</th>
-                    <th>Check-Out Date/Time</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if ($result && $result->num_rows > 0): ?>
-                    <?php while ($row = $result->fetch_assoc()): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($row['date']) ?></td>
-                            <td><?= htmlspecialchars($row['guest_name']) ?></td>
-                            <td><?= htmlspecialchars($row['guest_number']) ?></td>
-                            <td><?= htmlspecialchars($row['guest_id']) ?></td>
-                            <td><?= htmlspecialchars($row['room_number']) ?></td>
-                            <td><?= htmlspecialchars($row['amount']) ?></td>
-                            <td><?= htmlspecialchars($row['status']) ?></td>
-                            <td><?= htmlspecialchars($row['check_in']) ?: '-' ?></td>
-                            <td><?= htmlspecialchars($row['check_out']) ?: '-' ?></td>
-                            <td>
-                                <button
-                                    type="button"
-                                    class="btn btn-warning btn-sm shadow"
-                                    onclick="openEditModal(<?= htmlspecialchars(json_encode($row)) ?>)">
-                                    <i class="bi bi-pencil-square"></i>
-                                </button>
-                                <form action="../../backend/delete_booking.php" method="post" style="display: inline;">
-                                    <input type="hidden" name="delete" value="<?= $row['booking_id'] ?>">
-                                    <button type="submit" class="btn btn-danger btn-sm shadow">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    <?php endwhile; ?>
-                <?php else: ?>
+        <div class="table-responsive"> <!-- Add this wrapper for responsiveness -->
+            <table class="table table-hover table-striped mb-0" id="bookingsTable">
+                <thead class="table-dark">
                     <tr>
-                        <td colspan="10" class="text-center text-muted">No bookings found</td>
+                        <th>Date</th>
+                        <th>Guest Name</th>
+                        <th>Guest Number</th>
+                        <th>Guest ID (Omang)</th>
+                        <th>Room</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Check-In Date/Time</th>
+                        <th>Check-Out Date/Time</th>
+                        <th>Action</th>
                     </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    <?php if ($result && $result->num_rows > 0): ?>
+                        <?php while ($row = $result->fetch_assoc()): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($row['date']) ?></td>
+                                <td><?= htmlspecialchars($row['guest_name']) ?></td>
+                                <td><?= htmlspecialchars($row['guest_number']) ?></td>
+                                <td><?= htmlspecialchars($row['guest_id']) ?></td>
+                                <td><?= htmlspecialchars($row['room_number']) ?></td>
+                                <td><?= htmlspecialchars($row['amount']) ?></td>
+                                <td><?= htmlspecialchars($row['status']) ?></td>
+                                <td><?= htmlspecialchars($row['check_in']) ?: '-' ?></td>
+                                <td><?= htmlspecialchars($row['check_out']) ?: '-' ?></td>
+                                <td>
+                                    <button
+                                        type="button"
+                                        class="btn btn-warning btn-sm shadow"
+                                        onclick="openEditModal(<?= htmlspecialchars(json_encode($row)) ?>)">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    <form action="../../backend/delete_booking.php" method="post" style="display: inline;">
+                                        <input type="hidden" name="delete" value="<?= $row['booking_id'] ?>">
+                                        <button type="submit" class="btn btn-danger btn-sm shadow">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="10" class="text-center text-muted">No bookings found</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
+
 
 <style>
     /* Add rounded corners and border for table wrapper */
@@ -143,7 +146,7 @@ $result = $conn->query($sql);
 
 <!-- CREATE BOOKING MODAL -->
 <div class="modal fade" id="createBookingModal" tabindex="-1" aria-labelledby="createBookingModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="createBookingModalLabel">Create Booking</h5>

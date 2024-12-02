@@ -75,34 +75,34 @@ $recentBookings = $conn->query("
     LIMIT 5
 ");
 ?>
+
 <!-- MONTHLY STATISTICS -->
 <div class="container mt-5">
 
     <!-- DASHBOARD OVERVIEW CARDS -->
-    <div class="row">
-        <h3>Monthly Statistics</h3>
-        <!-- Dashboard Overview Cards -->
-        <div class="col-md-4">
-            <div class="card text-center shadow">
+    <div class="row g-3">
+        <h3 class="mb-4 text-center">Monthly Statistics</h3>
+        <div class="col-12 col-md-4">
+            <div class="card text-center shadow h-100">
                 <div class="card-body">
                     <h5 class="card-title">Total Guests</h5>
-                    <p class="card-text"><?= $totalGuests == null ? 0 : $totalGuests ?></p>
+                    <p class="card-text fs-4"><?= $totalGuests == null ? 0 : $totalGuests ?></p>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card text-center">
-                <div class="card-body shadow">
+        <div class="col-12 col-md-4">
+            <div class="card text-center shadow h-100">
+                <div class="card-body">
                     <h5 class="card-title">Total Earnings</h5>
-                    <p class="card-text">BWP<?= number_format($totalAmount, 2) ?></p>
+                    <p class="card-text fs-4">BWP<?= number_format($totalAmount, 2) ?></p>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card text-center shadow">
+        <div class="col-12 col-md-4">
+            <div class="card text-center shadow h-100">
                 <div class="card-body">
                     <h5 class="card-title">Total Bookings</h5>
-                    <p class="card-text"><?= $totalBookings ?></p>
+                    <p class="card-text fs-4"><?= $totalBookings ?></p>
                 </div>
             </div>
         </div>
@@ -111,29 +111,58 @@ $recentBookings = $conn->query("
 
 <!-- SALES CHART SECTION -->
 <div class="container mt-5">
-    <div id="sales_chart_div" class="chart-container"></div>
+    <h3 class="text-center">Monthly Revenue Chart</h3>
+    <div id="sales_chart_div" class="chart-container mx-auto"></div>
+</div>
+
+<!-- RECENT BOOKINGS -->
+<div class="container mt-5">
+    <h3 class="text-center mb-4">Recent Bookings</h3>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Date</th>
+                    <th>Guest Name</th>
+                    <th>Room Type</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($row = $recentBookings->fetch_assoc()): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($row['date']) ?></td>
+                        <td><?= htmlspecialchars($row['guest_name']) ?></td>
+                        <td><?= htmlspecialchars($row['room_type']) ?></td>
+                        <td>BWP<?= number_format($row['price'], 2) ?></td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
+    </div>
 </div>
 <br><br>
 
 <style>
     .chart-container {
-        width: 90%;
-        height: 500px;
+        width: 100%;
+        max-width: 1000px; /* Adjust max-width for larger screens */
+        height: auto; /* Let height adjust dynamically */
+        aspect-ratio: 16 / 9; /* Maintain a consistent aspect ratio */
         margin: 0 auto;
     }
 </style>
 
 <!-- Google Charts Script -->
 <script type="text/javascript">
-    google.charts.load('current', {
-        packages: ['corechart']
-    });
+    google.charts.load('current', { packages: ['corechart'] });
     google.charts.setOnLoadCallback(drawSalesChart);
+
+    let salesChart;
 
     function drawSalesChart() {
         const rawData = <?php echo json_encode($chartData); ?>;
 
-        // Data for sales chart
         const salesData = new google.visualization.DataTable();
         salesData.addColumn('string', 'Month');
         salesData.addColumn('number', 'Total Revenue (BWP)');
@@ -144,48 +173,43 @@ $recentBookings = $conn->query("
         const salesOptions = {
             title: 'Monthly Revenue',
             titleTextStyle: {
-                fontSize: 25, // Set the desired font size for the title
-                bold: true, // Optionally make the title bold
-                color: '#333' // Optionally set a custom color for the title
+                fontSize: 18,
+                bold: true,
+                color: '#333',
             },
             hAxis: {
                 title: 'Month',
-                textStyle: {
-                    fontSize: 12
-                },
-                titleTextStyle: {
-                    fontSize: 14
-                }
+                textStyle: { fontSize: 10 },
+                titleTextStyle: { fontSize: 12 },
             },
             vAxis: {
                 title: 'Sales (BWP)',
-                textStyle: {
-                    fontSize: 12
-                },
-                titleTextStyle: {
-                    fontSize: 14
-                },
-
+                textStyle: { fontSize: 10 },
+                titleTextStyle: { fontSize: 12 },
             },
-            legend: {
-                position: 'bottom'
-            },
-            colors: ['#FF5722'], // Custom line color (Orange)
-            curveType: 'function', // Smooth curve for the line chart
-            pointSize: 6, // Size of the points on the line
-            backgroundColor: '#f9f9f9', // Light background for the chart
+            legend: { position: 'bottom' },
+            colors: ['#FF5722'],
+            curveType: 'function',
+            pointSize: 4,
+            backgroundColor: '#f9f9f9',
             tooltip: {
-                textStyle: {
-                    color: '#000', // Black text in tooltips
-                    fontSize: 12
-                },
-                showColorCode: true
-            }
+                textStyle: { color: '#000', fontSize: 10 },
+                showColorCode: true,
+            },
         };
 
-        const salesChart = new google.visualization.LineChart(document.getElementById('sales_chart_div'));
+        const container = document.getElementById('sales_chart_div');
+        salesChart = new google.visualization.LineChart(container);
         salesChart.draw(salesData, salesOptions);
     }
+
+    // Redraw the chart on window resize for responsiveness
+    window.addEventListener('resize', () => {
+        if (salesChart) {
+            drawSalesChart();
+        }
+    });
 </script>
+
 
 <?php include '../../components/footer.php'; ?>

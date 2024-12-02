@@ -15,7 +15,7 @@ include '../../backend/db_connection.php';
         <button type="button" class="btn btn-primary text-end">Add a room</button>
     </a>
     
-    <div class="row d-flex justify-content-end">
+    <div class="row d-flex justify-content-end mt-2">
 
         <!-- SEARCH INPUT FIELD -->
         <div class="col-md-4">

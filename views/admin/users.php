@@ -16,7 +16,7 @@ include '../../components/navbar.php';
         </a>
 
         <!-- SEARCH USER BY EMAIL -->
-        <div class="row mb-3 d-flex justify-content-end ">
+        <div class="row mb-3 d-flex justify-content-end mt-2">
             <div class="col-md-4">
                 <input
                     type="text"
@@ -32,70 +32,71 @@ include '../../components/navbar.php';
             <div class="col">
                 <div id="usersTable">
                     <div class="applications-table border border-secondary shadow-sm rounded-4" style="overflow: hidden;">
-                        <table class="table table-hover table-striped">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>#</th>
-                                    <th>Employee Name</th>
-                                    <th>Employee Email</th>
-                                    <th>Employee Number</th>
-                                    <th>Role</th>
-                                    <th></th>
-                                    <th>Salary (BWP)</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="userTableBody">
-                                <?php
+                        <div class="table-responsive"> <!-- Add table-responsive wrapper -->
+                            <table class="table table-hover table-striped">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Employee Name</th>
+                                        <th>Employee Email</th>
+                                        <th>Employee Number</th>
+                                        <th>Role</th>
+                                        <th>Status</th> <!-- Missing header added -->
+                                        <th>Salary (BWP)</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="userTableBody">
+                                    <?php
+                                    include '../../backend/db_connection.php';
 
-                                include '../../backend/db_connection.php';
+                                    // Select data from applications table
+                                    $sql = "SELECT * FROM users";
+                                    $result = $conn->query($sql);
 
-                                // Select data from applications table
-                                $sql = "SELECT * FROM users";
-                                $result = $conn->query($sql);
+                                    $count = 1;
 
-                                $count = 1;
-
-                                if ($result->num_rows > 0) {
-                                    while ($row = $result->fetch_assoc()) {
-                                        echo "<tr>";
-                                        echo "<td>" . $count++ . "</td>";
-                                        echo "<td>" . $row["firstname"] . " " . $row["lastname"] . "</td>";
-                                        echo "<td>" . $row["email"] . "</td>";
-                                        echo "<td>" . $row["phone"] . "</td>";
-                                        echo "<td>" . $row["role"] . "</td>";
-                                        echo "<td>" . $row["status"] . "</td>";
-                                        echo "<td>" . $row["salary"] . "</td>";
-                                        echo "<td>";
-                                        echo "<button class='btn btn-warning btn-sm shadow' onclick=\"editUser(
-                                                    '{$row['user_id']}', 
-                                                    '{$row['firstname']}', 
-                                                    '{$row['lastname']}', 
-                                                    '{$row['email']}', 
-                                                    '{$row['phone']}',
-                                                    '{$row['role']}',
-                                                    '{$row['salary']}'
-                                                )\">Edit</button> ";
-                                        echo "<form method='post' action='../../backend/delete_user.php' style='display:inline;'>";
-                                        echo "<input type='hidden' name='delete' value='" . $row["email"] . "'>";
-                                        echo "<input class='btn btn-danger btn-sm shadow' type='submit' value='Delete'>";
-                                        echo "</form>";
-                                        echo "</td>";
-
-                                        echo "</tr>";
+                                    if ($result->num_rows > 0) {
+                                        while ($row = $result->fetch_assoc()) {
+                                            echo "<tr>";
+                                            echo "<td>" . $count++ . "</td>";
+                                            echo "<td>" . $row["firstname"] . " " . $row["lastname"] . "</td>";
+                                            echo "<td>" . $row["email"] . "</td>";
+                                            echo "<td>" . $row["phone"] . "</td>";
+                                            echo "<td>" . $row["role"] . "</td>";
+                                            echo "<td>" . $row["status"] . "</td>";
+                                            echo "<td>" . $row["salary"] . "</td>";
+                                            echo "<td>";
+                                            echo "<button class='btn btn-warning btn-sm shadow' onclick=\"editUser(
+                                                '{$row['user_id']}', 
+                                                '{$row['firstname']}', 
+                                                '{$row['lastname']}', 
+                                                '{$row['email']}', 
+                                                '{$row['phone']}',
+                                                '{$row['role']}',
+                                                '{$row['salary']}'
+                                            )\">Edit</button> ";
+                                            echo "<form method='post' action='../../backend/delete_user.php' style='display:inline;'>";
+                                            echo "<input type='hidden' name='delete' value='" . $row["email"] . "'>";
+                                            echo "<input class='btn btn-danger btn-sm shadow' type='submit' value='Delete'>";
+                                            echo "</form>";
+                                            echo "</td>";
+                                            echo "</tr>";
+                                        }
+                                    } else {
+                                        echo "<tr><td colspan='8' class='text-center'>No results found</td></tr>";
                                     }
-                                } else {
-                                    echo "<tr><td colspan='6'>No results found</td></tr>";
-                                }
 
-                                $conn->close();
-                                ?>
-                            </tbody>
-                        </table>
+                                    $conn->close();
+                                    ?>
+                                </tbody>
+                            </table>
+                        </div> <!-- End table-responsive wrapper -->
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
 </section>
 
@@ -250,8 +251,6 @@ include '../../components/navbar.php';
         var editModal = new bootstrap.Modal(document.getElementById('addUserModal'));
         editModal.show();
     }
-
-    
 </script>
 
 

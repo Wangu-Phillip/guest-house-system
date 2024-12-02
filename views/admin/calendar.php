@@ -222,7 +222,6 @@ if ($result && $result->num_rows > 0) {
     #calendar {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
-        /* 7 columns for each day of the week */
         grid-auto-rows: 100px;
         gap: 1px;
         background: #fff;
@@ -256,7 +255,6 @@ if ($result && $result->num_rows > 0) {
 
     .day:hover {
         background-color: #f0f8ff;
-        /* Optional: Change background color on hover */
     }
 
     .day::-webkit-scrollbar {
@@ -277,7 +275,52 @@ if ($result && $result->num_rows > 0) {
         font-size: 12px;
         box-shadow: 5px 8px 15px rgba(0, 0, 0, 0.1);
     }
+
+    /* Media Queries for Smaller Devices */
+    @media (max-width: 768px) {
+        .day-header {
+            display: none; /* Hide the day headers on small screens */
+        }
+
+        #calendar {
+            grid-template-columns: repeat(3, 1fr); /* Adjust to 3 columns for smaller devices */
+            grid-auto-rows: auto;
+        }
+
+        .day {
+            max-height: 80px;
+            font-size: 12px;
+        }
+
+        .day .date {
+            font-size: 14px;
+        }
+
+        .event {
+            font-size: 10px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        #calendar {
+            grid-template-columns: repeat(2, 1fr); /* Adjust to 2 columns for very small devices */
+        }
+
+        .day {
+            max-height: 70px;
+        }
+
+        .day .date {
+            font-size: 12px;
+        }
+
+        .event {
+            font-size: 9px;
+        }
+    }
 </style>
+
+
 
 <script>
     // CALENDAR BOOKING LISTENER

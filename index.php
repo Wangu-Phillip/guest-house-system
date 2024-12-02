@@ -4,10 +4,10 @@
 <div class="container d-flex justify-content-center align-items-center vh-100">
     <div class="row w-100">
         <!-- Login Form -->
-        <div class="col-md-6 bg-white p-5">
-            <form method="POST" action="backend/process_login.php" class="position-absolute top-50 start-50 translate-middle border p-4 rounded-3 shadow-lg col-3">
-            <h2 class="text-center">Login</h2>    
-            <div class="mb-3">
+        <div class="col-12 col-md-8 col-lg-5 bg-white p-4 mx-auto shadow rounded-3">
+            <h2 class="text-center mb-4">Login</h2>
+            <form method="POST" action="backend/process_login.php">
+                <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
                     <input type="email" class="form-control" id="email" name="email" required>
                 </div>
@@ -16,10 +16,9 @@
                     <input type="password" class="form-control" id="password" name="password" required>
                 </div>
                 <button type="submit" class="btn btn-success w-100">Login</button>
-            
-            <div class="text-center mt-3">
-                <a href="views/register.php" class="text-decoration-none">Don't have an account? Register</a>
-            </div>
+                <div class="text-center mt-3">
+                    <a href="views/register.php" class="text-decoration-none">Don't have an account? Register</a>
+                </div>
             </form>
         </div>
     </div>
