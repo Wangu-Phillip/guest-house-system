@@ -21,6 +21,12 @@ $sql = "SELECT
         ORDER BY b.date DESC";
 
 $result = $conn->query($sql);
+$bookings = [];
+if ($result && $result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $bookings[] = $row;
+    }
+}
 ?>
 
 
@@ -62,65 +68,111 @@ $result = $conn->query($sql);
     </div>
 </div>
 
-<!-- BOOKINGS SECTION START -->
+
+<!-- BOOKINGS SECTION WITH TABS -->
 <div class="container mt-2">
-    <!-- Table Wrapper for Rounded Corners -->
-    <div class="rounded border border-secondary shadow-sm" style="overflow: hidden;">
-        <div class="table-responsive"> <!-- Add this wrapper for responsiveness -->
-            <table class="table table-hover table-striped mb-0" id="bookingsTable">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Date</th>
-                        <th>Guest Name</th>
-                        <th>Guest Number</th>
-                        <th>Guest ID (Omang)</th>
-                        <th>Room</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                        <th>Check-In Date/Time</th>
-                        <th>Check-Out Date/Time</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if ($result && $result->num_rows > 0): ?>
-                        <?php while ($row = $result->fetch_assoc()): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($row['date']) ?></td>
-                                <td><?= htmlspecialchars($row['guest_name']) ?></td>
-                                <td><?= htmlspecialchars($row['guest_number']) ?></td>
-                                <td><?= htmlspecialchars($row['guest_id']) ?></td>
-                                <td><?= htmlspecialchars($row['room_number']) ?></td>
-                                <td><?= htmlspecialchars($row['amount']) ?></td>
-                                <td><?= htmlspecialchars($row['status']) ?></td>
-                                <td><?= htmlspecialchars($row['check_in']) ?: '-' ?></td>
-                                <td><?= htmlspecialchars($row['check_out']) ?: '-' ?></td>
-                                <td>
-                                    <button
-                                        type="button"
-                                        class="btn btn-warning btn-sm shadow"
-                                        onclick="openEditModal(<?= htmlspecialchars(json_encode($row)) ?>)">
-                                        <i class="bi bi-pencil-square"></i>
-                                    </button>
-                                    <form action="../../backend/delete_booking.php" method="post" style="display: inline;">
-                                        <input type="hidden" name="delete" value="<?= $row['booking_id'] ?>">
-                                        <button type="submit" class="btn btn-danger btn-sm shadow">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        <?php endwhile; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="10" class="text-center text-muted">No bookings found</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+    <!-- Bootstrap Tabs -->
+    <ul class="nav nav-tabs" id="statusTabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all" type="button" role="tab" aria-controls="all" aria-selected="true">All</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="checked-in-tab" data-bs-toggle="tab" data-bs-target="#checked-in" type="button" role="tab" aria-controls="checked-in" aria-selected="false">Checked In</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="checked-out-tab" data-bs-toggle="tab" data-bs-target="#checked-out" type="button" role="tab" aria-controls="checked-out" aria-selected="false">Checked Out</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="cancelled-tab" data-bs-toggle="tab" data-bs-target="#cancelled" type="button" role="tab" aria-controls="cancelled" aria-selected="false">Cancelled</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-controls="pending" aria-selected="false">Pending</button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content mt-3" id="statusTabsContent">
+        <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="all-tab">
+            <?php render_table($bookings); ?>
+        </div>
+        <div class="tab-pane fade" id="checked-in" role="tabpanel" aria-labelledby="checked-in-tab">
+            <?php render_table($bookings, "Checked In"); ?>
+        </div>
+        <div class="tab-pane fade" id="checked-out" role="tabpanel" aria-labelledby="checked-out-tab">
+            <?php render_table($bookings, "Checked Out"); ?>
+        </div>
+        <div class="tab-pane fade" id="cancelled" role="tabpanel" aria-labelledby="cancelled-tab">
+            <?php render_table($bookings, "Cancelled"); ?>
+        </div>
+        <div class="tab-pane fade" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+            <?php render_table($bookings, "Pending"); ?>
         </div>
     </div>
 </div>
+
+<!--  -->
+<?php
+// Function to render table based on status
+function render_table($bookings, $status = null)
+{
+    echo '<div class="rounded border border-secondary shadow-sm" style="overflow: hidden;">';
+    echo '<div class="table-responsive">';
+    echo '<table class="table table-hover table-striped mb-0" id="bookingsTable">';
+    echo '<thead class="table-dark">';
+    echo '<tr>
+            <th>Date</th>
+            <th>Guest Name</th>
+            <th>Guest Number</th>
+            <th>Guest ID (Omang)</th>
+            <th>Room</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Check-In Date/Time</th>
+            <th>Check-Out Date/Time</th>
+            <th>Action</th>
+          </tr>';
+    echo '</thead>';
+    echo '<tbody>';
+    if (!empty($bookings)) {
+        foreach ($bookings as $row) {
+            if ($status === null || $row['status'] === $status) {
+                echo '<tr>';
+                echo '<td>' . htmlspecialchars($row['date']) . '</td>';
+                echo '<td>' . htmlspecialchars($row['guest_name']) . '</td>';
+                echo '<td>' . htmlspecialchars($row['guest_number']) . '</td>';
+                echo '<td>' . htmlspecialchars($row['guest_id']) . '</td>';
+                echo '<td>' . htmlspecialchars($row['room_number']) . '</td>';
+                echo '<td>' . htmlspecialchars($row['amount']) . '</td>';
+                echo '<td>' . htmlspecialchars($row['status']) . '</td>';
+                echo '<td>' . (htmlspecialchars($row['check_in']) ?: '-') . '</td>';
+                echo '<td>' . (htmlspecialchars($row['check_out']) ?: '-') . '</td>';
+                echo '<td>
+                        <button
+                            type="button"
+                            class="btn btn-warning btn-sm shadow"
+                            onclick="openEditModal(' . htmlspecialchars(json_encode($row)) . ')">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <form action="../../backend/delete_booking.php" method="post" style="display: inline;">
+                            <input type="hidden" name="delete" value="' . $row['booking_id'] . '">
+                            <button type="submit" class="btn btn-danger btn-sm shadow">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                      </td>';
+                echo '</tr>';
+            }
+        }
+    } else {
+        echo '<tr><td colspan="10" class="text-center text-muted">No bookings found</td></tr>';
+    }
+    echo '</tbody>';
+    echo '</table>';
+    echo '</div>';
+    echo '</div>';
+}
+?>
+
 
 
 <style>
