@@ -88,7 +88,7 @@ include '../../backend/db_connection.php';
                         }
                         mysqli_free_result($result);
                     } else {
-                        echo "<tr><td colspan='8'>No products found</td></tr>";
+                        echo "<tr><td colspan='8'>No results found</td></tr>";
                     }
                     mysqli_close($conn);
                     ?>
