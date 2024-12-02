@@ -40,7 +40,7 @@ include '../../components/navbar.php';
                                     <th>Employee Email</th>
                                     <th>Employee Number</th>
                                     <th>Role</th>
-                                    <th>Status</th>
+                                    <th></th>
                                     <th>Salary (BWP)</th>
                                     <th>Action</th>
                                 </tr>

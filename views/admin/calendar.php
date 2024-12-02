@@ -251,6 +251,12 @@ if ($result && $result->num_rows > 0) {
         max-height: 100px;
         scrollbar-width: none;
         -ms-overflow-style: none;
+        cursor: pointer;
+    }
+
+    .day:hover {
+        background-color: #f0f8ff;
+        /* Optional: Change background color on hover */
     }
 
     .day::-webkit-scrollbar {
