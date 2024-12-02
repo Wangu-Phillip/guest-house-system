@@ -1,6 +1,15 @@
 <!-- update_user.php -->
 <?php
+session_start();
+
 @include "./db_connection.php";
+
+// Check if the user is logged in and has a role
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    // Redirect to login or access denied page
+    header("Location: ../../index.php");
+    exit(); // Stop further execution
+}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id = mysqli_real_escape_string($conn, $_POST['user_id']);

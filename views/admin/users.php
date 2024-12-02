@@ -3,6 +3,13 @@
 
 include '../../components/header.php';
 include '../../components/navbar.php';
+
+// Check if the user is logged in and has a role
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    // Redirect to login or access denied page
+    header("Location: ../../index.php");
+    exit(); // Stop further execution
+}
 ?>
 
 
@@ -131,7 +138,7 @@ include '../../components/navbar.php';
                         <input type="text" class="form-control" id="addPhone" name="phone" required>
                     </div>
                     <div class="mb-3">
-                        <label for="addRole2" class="form-label">Role</label>
+                        <label for="addRole" class="form-label">Role</label>
                         <select class="form-select" id="addRole" name="role" required>
                             <option value="admin">Admin</option>
                             <option value="employee">Employee</option>
@@ -185,7 +192,7 @@ include '../../components/navbar.php';
                         <label for="editRole" class="form-label">Role</label>
                         <select class="form-select" id="editRole" name="role" required>
                             <option value="admin">Admin</option>
-                            <option value="customer">Customer</option>
+                            <option value="employee">Employee</option>
                         </select>
                     </div>
                     <div class="mb-3">

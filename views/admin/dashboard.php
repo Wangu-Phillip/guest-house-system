@@ -1,10 +1,20 @@
 <?php
 include '../../components/header.php';
 include '../../components/navbar.php';
+
+// Check if the user is logged in and has a role
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+    // Redirect to login or access denied page
+    header("Location: ../../index.php");
+    exit(); // Stop further execution
+}
+
 include '../../components/toast.php';
 
 // Fetch data from the database
 include '../../backend/db_connection.php';
+
+
 
 // Queries for total statistics
 $currentMonth = date('m'); // Get current month as a two-digit number (e.g., 11 for November)
