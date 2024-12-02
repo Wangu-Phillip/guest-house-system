@@ -270,7 +270,7 @@ $result = $conn->query($sql);
                         </div>
                         <div class="mb-3">
                             <label for="addDate" class="form-label">Date Booked</label>
-                            <input type="date" class="form-control" id="addDate" name="datebooked" required>
+                            <input type="datetime-local" class="form-control" id="addDate" name="datebooked" required>
                         </div>
                         <div class="mb-3">
                             <label for="addNumberOfGuests" class="form-label">Number of Guests</label>
@@ -472,24 +472,12 @@ $result = $conn->query($sql);
         document.getElementById("editStatus").value = row.status;
 
         // Format the check-in and check-out values for datetime-local
-        document.getElementById("editCheckIn").value = formatDatetimeForInput(row.check_in);
-        document.getElementById("editCheckOut").value = formatDatetimeForInput(row.check_out);
+        document.getElementById("editCheckIn").value = row.check_in;
+        document.getElementById("editCheckOut").value = row.check_out;
 
         // Show the modal
         var editModal = new bootstrap.Modal(document.getElementById("editBookingModal"));
         editModal.show();
-    }
-
-    // Function to format date for datetime-local input
-    function formatDatetimeForInput(datetime) {
-        if (!datetime) return ''; // Return empty if no date is provided
-        const date = new Date(datetime);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        return `${year}-${month}-${day}T${hours}:${minutes}`;
     }
 </script>
 

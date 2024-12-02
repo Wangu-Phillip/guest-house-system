@@ -37,6 +37,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["search"])) {
             echo "<td>" . htmlspecialchars($row["check_in"]) ?: '-' . "</td>";
             echo "<td>" . htmlspecialchars($row["check_out"]) ?: '-' . "</td>";
             echo "<td>";
+            echo "<button type='button' class='btn btn-warning btn-sm shadow me-4' 
+                    onclick='openEditModal(" . htmlspecialchars(json_encode($row)) . ")'>
+                    <i class='bi bi-pencil-square'></i>
+                  </button>";
             echo "<form method='post' action='../../backend/delete_booking.php' style='display:inline;'>";
             echo "<input type='hidden' name='delete' value='" . htmlspecialchars($row["booking_id"]) . "'>";
             echo "<button class='btn btn-danger btn-sm' type='submit'><i class='bi bi-trash'></i></button>";
@@ -51,4 +55,3 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["search"])) {
     mysqli_close($conn);
     exit;
 }
-?>

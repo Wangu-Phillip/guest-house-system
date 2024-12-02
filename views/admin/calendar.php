@@ -8,7 +8,7 @@ $sql = "SELECT b.booking_id, DATE(b.date) AS date, CONCAT(g.firstname, ' ', g.la
         FROM bookings b
         LEFT JOIN guests g ON b.guest_id = g.guest_id
         LEFT JOIN rooms r ON b.room_id = r.room_id
-        WHERE (b.check_in IS NOT NULL OR b.check_in != '0000-00-00 00:00:00')
+        WHERE (b.check_in IS NOT NULL OR b.check_in != '0000-00-00 00:00:00' OR b.check_in IS NULL)
         AND (b.check_out IS NULL OR b.check_out = '0000-00-00 00:00:00')";
 $result = $conn->query($sql);
 
